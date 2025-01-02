@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Beamer on 3000ye&#39;s Blog</title>
+        <link>https://3000ye.com/tags/beamer/</link>
+        <description>Recent content in Beamer on 3000ye&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Fri, 16 Feb 2024 23:33:47 +0800</lastBuildDate><atom:link href="https://3000ye.com/tags/beamer/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>dhuBeamer</title>
+        <link>https://3000ye.com/p/dhubeamer/</link>
+        <pubDate>Fri, 16 Feb 2024 23:33:47 +0800</pubDate>
+        
+        <guid>https://3000ye.com/p/dhubeamer/</guid>
+        <description>&lt;img src="https://3000ye.com/p/dhubeamer/assets/latex.jpg" alt="Featured image of post dhuBeamer" /&gt;&lt;h1 id=&#34;东华大学学术-beamer-模板&#34;&gt;东华大学学术 Beamer 模板
+&lt;/h1&gt;&lt;p&gt;本模板为东华大学专用的学术报告 Slides 的 LaTeX Beamer 模板使用说明，主要特点为：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;设计元素全部来源于东华大学 &lt;a class=&#34;link&#34; href=&#34;https://www.dhu.edu.cn/bsxt/listm.htm&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;标识系统&lt;/a&gt;，浓浓的东华风。&lt;/li&gt;
+&lt;li&gt;Slides 整体风格借鉴了东华大学标准 PPT 模板与学术 PPT 模板（2020版，&lt;a class=&#34;link&#34; href=&#34;https://www.dhu.edu.cn/_upload/article/files/d2/8c/2137ec0c44238fd6fbd3ee28ff07/9f9b566a-67f1-4717-991f-477ee5b43acb.zip&#34;  target=&#34;_blank&#34; rel=&#34;noopener&#34;
+    &gt;模板连接&lt;/a&gt;）。&lt;/li&gt;
+&lt;li&gt;简洁清晰的底部导航区让 Slides 更适合学术汇报使用。&lt;/li&gt;
+&lt;li&gt;前后端分离式设计，&lt;code&gt;.tex&lt;/code&gt; 文件中只需聚焦内容，&lt;code&gt;.sty&lt;/code&gt; 配置文件隔离存放。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;使用-dhubeamer-模板&#34;&gt;使用 dhuBeamer 模板
+&lt;/h2&gt;&lt;h3 id=&#34;认识-beamer-中的元素&#34;&gt;认识 Beamer 中的元素
+&lt;/h3&gt;&lt;p&gt;Beamer 根据元素在 Slides 中的不同作用，主要做了以下划分：&lt;/p&gt;
+&lt;div style=&#39;display: flex; justify-content: center;&#39;&gt;
+&lt;img src=&#39;assets/Beamer元素.png&#39; alt=&#39;img&#39; style=&#39;zoom:50%;&#39; /&gt;
+&lt;/div&gt;
+&lt;h2 id=&#34;修改-dhubeamer-模板&#34;&gt;修改 dhuBeamer 模板
+&lt;/h2&gt;</description>
+        </item>
+        
+    </channel>
+</rss>
