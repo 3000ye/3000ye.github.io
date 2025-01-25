@@ -1,0 +1,672 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+        <title>Camera on 3000ye&#39;s Blog</title>
+        <link>https://3000ye.com/tags/camera/</link>
+        <description>Recent content in Camera on 3000ye&#39;s Blog</description>
+        <generator>Hugo -- gohugo.io</generator>
+        <language>en-us</language>
+        <lastBuildDate>Sun, 08 Oct 2023 14:30:49 +0000</lastBuildDate><atom:link href="https://3000ye.com/tags/camera/index.xml" rel="self" type="application/rss+xml" /><item>
+        <title>Camera Calibration</title>
+        <link>https://3000ye.com/p/camera-calibration/</link>
+        <pubDate>Sun, 08 Oct 2023 14:30:49 +0000</pubDate>
+        
+        <guid>https://3000ye.com/p/camera-calibration/</guid>
+        <description>&lt;img src="https://3000ye.com/p/camera-calibration/board.jpg" alt="Featured image of post Camera Calibration" /&gt;&lt;h1 id=&#34;由浅到深理解相机标定&#34;&gt;由浅到深理解相机标定
+&lt;/h1&gt;&lt;h2 id=&#34;何为相机标定&#34;&gt;何为相机标定
+&lt;/h2&gt;&lt;p&gt;在图像测量过程以及机器视觉应用中，为确定空间无哦表面某点的三维几何位置与其在图像中对应点之间的相互关系，必须建立相机成像的几何模型，这些几何模型参数就是相机参数。&lt;/p&gt;
+&lt;p&gt;在大多数条件下这些参数必须通过实验与计算才能得到，这个求解参数的过程就称之为&lt;strong&gt;相机标定（或摄像头标定）&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;相机标定&lt;/strong&gt;涉及的知识面很广：成像几何、镜头畸变、单应矩阵、非线性优化等。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;相机标定&lt;/strong&gt;有自标定（找图像中特征点）、标定板标定（特征点易求，稳定性好），一般采用标定板标定。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;相机标定&lt;/strong&gt;按照相机是否静止，可分为静态相机标定（标定板动，相机静止），动态相机标定（标定板静止，相机运动）。&lt;/p&gt;
+&lt;h3 id=&#34;为什么需要标定&#34;&gt;为什么需要标定
+&lt;/h3&gt;&lt;p&gt;任何理论物理模型都是在特定假设上对真实事物的近似，然而在实际应用中存在误差，普通相机的成像模型也不例外（透视投影）。&lt;/p&gt;
+&lt;p&gt;实际中，普通相机成像误差的主要来源有两部分：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;第一是sensor（传感器）制造产生的误差，比如sensor成像单元不是正方形，sensor歪斜。&lt;/li&gt;
+&lt;li&gt;第二是镜头制造和安装产生的误差，镜头一般存在非线性的径向畸变；镜头与相机sensor安装不平行，还会产生切向畸变。&lt;/li&gt;
+&lt;/ul&gt;
+&lt;h2 id=&#34;相机标定的目的和意义&#34;&gt;相机标定的目的和意义
+&lt;/h2&gt;&lt;p&gt;我们所处的世界是三维的，而照片是二维的，这样我们可以把相机认为是一个函数，输入量是一个场景，输出量是一幅灰度图。这个从三维到二维的过程的函数是不可逆的。&lt;/p&gt;
+&lt;p&gt;相机标定的目标是我们找一个合适的数学模型，求出这个模型的参数，这样我们能够近似这个三维到二维的过程，使这个三维到二维的过程的函数找到反函数。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/v2-afff3b4901966569a5203751afb5e50f_1440w.webp&#34;
+	width=&#34;898&#34;
+	height=&#34;615&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/v2-afff3b4901966569a5203751afb5e50f_1440w_hu_8ab535edc25aa531.webp 480w, https://3000ye.com/p/camera-calibration/assets/v2-afff3b4901966569a5203751afb5e50f_1440w_hu_da3bd67849419e37.webp 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;146&#34;
+		data-flex-basis=&#34;350px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;这个逼近的过程就是「相机标定」，我们用简单的数学模型来表达复杂的成像过程，并且求出成像的反过程。标定之后的相机，可以进行三维场景的重建，即深度的感知。&lt;/p&gt;
+&lt;h2 id=&#34;相关术语&#34;&gt;相关术语
+&lt;/h2&gt;&lt;p&gt;&lt;strong&gt;焦点：&lt;strong&gt;在几何光学中有时也称为&lt;/strong&gt;像点&lt;/strong&gt;，是源头的光线经过物镜后汇聚的点。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;焦距：&lt;strong&gt;也称为&lt;/strong&gt;焦长&lt;/strong&gt;，是光学系统中衡量光的聚集或发散的度量方式，指从透镜中心到光聚集之焦点的距离。亦是照相机中，从镜片光学中心到底片、CCD或CMOS等成像平面的距离。&lt;/p&gt;
+&lt;p&gt;正透镜、负透镜、凹面镜和凸面镜的焦点&lt;code&gt;F&lt;/code&gt;和焦距&lt;code&gt;f&lt;/code&gt;：&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/1.png&#34; alt=&#34;img&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;&lt;strong&gt;镜头（Lenses）&lt;/strong&gt;：是将拍摄景物在传感器上成像的器件，它通常由几片透镜、光圈叶片、对焦马达等光学元件组成。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;传感器（Sensor）&lt;/strong&gt;：是摄像头组成的核心，其作用是作为相机的感光元件。摄像头传感器主要有两种，一种是CCD传感器，一种是CMOS传感器，两者区别在于：CCD的优势在于成像质量好，但是由于制造工艺复杂，成本居高不下，特别是大型CCD，价格非常高昂。在相同分辨率下，CMOS价格比CCD便宜，但是CMOS器件产生的图像质量相比CCD来说要低一些。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;光心&lt;/strong&gt;：凸透镜近轴光线中，入射线和与其对应且相平行的出射线构成共轭光线，其入射点跟出射点的连线与主光轴的交点，称为凸透镜的焦点，位于透镜中央的点叫光心。&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/3.png&#34; alt=&#34;img&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;从图中可知，&lt;code&gt;O&lt;/code&gt;为光心，&lt;code&gt;F&lt;/code&gt;为焦点。每个透镜主轴上都有一个特殊点，凡是通过该点的光，其传播方向不变，这个点叫光心。经过光心的光线的传播方向不会发生改变。&lt;/p&gt;
+&lt;h2 id=&#34;相机标定原理模型&#34;&gt;相机标定原理模型
+&lt;/h2&gt;&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio.png&#34;
+	width=&#34;1568&#34;
+	height=&#34;716&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b04ff5d1e7a1a51e.png 480w, https://3000ye.com/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b5f60b8ddd2d3fb1.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;相机标定.drawio&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;218&#34;
+		data-flex-basis=&#34;525px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;针孔相机模型&#34;&gt;针孔相机模型
+&lt;/h3&gt;&lt;p&gt;我们通常将相机看成如下所示的透镜模型：&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/2.png&#34; alt=&#34;img&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;在实际分析时，通常将其简化为针孔模型（小孔成像）：&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/4.png&#34; alt=&#34;img&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;一般为了分析简单，将成像平面画在对称位置，这样图像不再颠倒：&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/5.png&#34; alt=&#34;img&#34; style=&#34;zoom:50%;&#34; /&gt;
+&lt;/div&gt;
+&lt;h3 id=&#34;四个坐标系&#34;&gt;四个坐标系
+&lt;/h3&gt;&lt;p&gt;&lt;strong&gt;世界坐标系&lt;/strong&gt;：用户定义的三维世界的坐标系，用于描述目标物体在真实世界里的位置。单位通常为米（m）。该坐标系作用于三维空间。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;相机坐标系&lt;/strong&gt;：在相机上建立的坐标系，为了从相机的角度描述物体位置而定义，作为沟通世界坐标系和图像/像素坐标系的中间一环。单位通常为米（m）。相机坐标系的原点在光心，其 $X_c、Y_c$ 轴分别与像面的两边平行，其 $Z_c$ 轴与光轴重合，且垂直于图像坐标系平面并通过图像坐标系的原点（实际情况中可能存在&lt;strong&gt;主点偏移&lt;/strong&gt;），相机坐标系与图像坐标系之间的距离为焦距 $f$。该坐标系作用于三维空间。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;图像坐标系&lt;/strong&gt;：为了描述成像过程中物体从相机坐标系到图像坐标系的投影投射关系而引入，方便进一步得到像素坐标系下的坐标。其原点是相机光轴与像面的交点（称为主点），即&lt;strong&gt;图像的中心点&lt;/strong&gt;。其 $x, y$ 轴和像素坐标系的 $u, v$ 轴平行，故图像坐标系和像素坐标系实际是平移关系。单位通常为毫米（mm）。该坐标系作用于二维空间。&lt;/p&gt;
+&lt;p&gt;&lt;strong&gt;像素坐标系&lt;/strong&gt;：为了描述物体成像后的像点在数字图像上（相片）的坐标而引入，是我们真正从相机内读取到的信息所在的坐标系。单位为像素。像素坐标平面和图像坐标系平面重合，但像素坐标系原点位于图像左上角。该坐标系作用于二维空间。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/6.png&#34;
+	width=&#34;1248&#34;
+	height=&#34;841&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/6_hu_5b9c7ac273581063.png 480w, https://3000ye.com/p/camera-calibration/assets/6_hu_8632a9ab9fc48ffe.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;148&#34;
+		data-flex-basis=&#34;356px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h3 id=&#34;相机外参&#34;&gt;相机外参
+&lt;/h3&gt;&lt;p&gt;将世界坐标系中的点映射到相机坐标系：相机坐标系是世界坐标系通过&lt;strong&gt;刚体变换&lt;/strong&gt;得到的。&lt;/p&gt;
+&lt;blockquote&gt;
+&lt;p&gt;刚体变换能够保持物体中各点的距离和角度，常见的刚体变换有：平移、旋转和镜像。&lt;/p&gt;
+&lt;/blockquote&gt;
+&lt;p&gt;我们先只考虑旋转，假设将坐标系以 $X$ 轴为中心进行旋转，即 $X$ 不变，旋转 $Y - Z$ 平面。&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/7.png&#34; alt=&#34;img&#34; style=&#34;zoom: 33%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;假设旋转角度为 $\theta$，即 $\angle Y&amp;rsquo; O Y = \angle Z&amp;rsquo; O Z = \theta$。旋转前的坐标系为 $X - Y - Z$，旋转后的坐标系为 $X&amp;rsquo; - Y&amp;rsquo; - Z&amp;rsquo;$。假设点 $P$ 在 $X - Y - Z$ 中的坐标为（$X_w, Y_w, Z_w$），旋转后，其在 $X&amp;rsquo; - Y&amp;rsquo; - Z&amp;rsquo;$ 中的坐标为（$X_c, Y_c, Z_c$）：
+$$
+X_C = X_w
+$$&lt;/p&gt;
+&lt;p&gt;$$
+\begin{array}{l}
+Y_c &amp;amp; = OC + CD = OA \cdot \sin \theta + BP \\
+&amp;amp; = Z_w \cdot \sin \theta + AP \cdot \cos \theta \\
+&amp;amp; = Z_w \sin \theta + Y_w \cos \theta
+\end{array}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+\begin{array}{l}
+Z_c &amp;amp; = PD = AC - AB \\
+&amp;amp; = AO \cdot \cos \theta - AP \cdot \cos \theta \\
+&amp;amp; = Z_w \cos \theta + Y_w \cos \theta
+\end{array}
+$$&lt;/p&gt;
+&lt;p&gt;写成矩阵形式：
+$$\displaystyle \begin{bmatrix} X_c \\ Y_c \\ Z_c \end{bmatrix} = \mathbf{R_{cw}} \begin{bmatrix} X_w \\ Y_w \\ Z_w \end{bmatrix} or \begin{bmatrix} X_w \\ Y_w \\ Z_w \end{bmatrix} = \mathbf{R_{wc}} \begin{bmatrix} X_c \\ Y_c \\ Z_c \end{bmatrix} $$
+推广到每个方向，可得到 $\mathbf{R_{cw}}, \mathbf{R_{wc}}$ 为：
+$$
+\mathbf{R_{cw}} (X_A, \theta) =
+\begin{bmatrix}
+1 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; \cos \theta &amp;amp; \sin \theta \\
+0 &amp;amp; - \sin \theta &amp;amp; \cos \theta
+\end{bmatrix}
+,
+\mathbf{R_{wc}} (X_A, \theta) =
+\begin{bmatrix}
+1 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; \cos \theta &amp;amp; - \sin \theta \\
+0 &amp;amp; \sin \theta &amp;amp; \cos \theta
+\end{bmatrix}
+$$
+$$
+\mathbf{R_{cw}} (Y_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp;amp; 0 &amp;amp; \sin \theta \\
+0 &amp;amp; 1 &amp;amp; 0 \\ - \sin \theta &amp;amp; 0 &amp;amp; \cos \theta
+\end{bmatrix}
+,
+\mathbf{R_{wc}} (Y_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp;amp; 0 &amp;amp; - \sin \theta \\
+0 &amp;amp; 1 &amp;amp; 0 \\
+\sin \theta &amp;amp; 0 &amp;amp; \cos \theta
+\end{bmatrix}
+$$
+$$
+\mathbf{R_{cw}} (Z_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp;amp; \sin \theta &amp;amp; 0 \\ - \sin \theta &amp;amp; \cos \theta &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1
+\end{bmatrix}
+,
+\mathbf{R_{wc}} (Z_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp;amp; - \sin \theta &amp;amp; 0 \\
+\sin \theta &amp;amp; \cos \theta &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;这里我们使用右手笛卡尔三维坐标系：&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/14.png&#34; alt=&#34;img&#34; style=&#34;zoom: 25%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;旋转可分为&lt;strong&gt;主动旋转&lt;/strong&gt;与&lt;strong&gt;被动旋转&lt;/strong&gt;。&lt;strong&gt;主动旋转&lt;/strong&gt;是指将向量逆时针围绕旋转轴所做出的旋转。&lt;strong&gt;被动旋转&lt;/strong&gt;是对坐标轴本身进行的逆时针旋转，它相当于主动旋转的逆操作。关于右手笛卡尔坐标系的 $X, Y, Z$ 轴的旋转分别叫做&lt;code&gt;roll&lt;/code&gt;，&lt;code&gt;pitch&lt;/code&gt;和&lt;code&gt;yaw&lt;/code&gt;旋转：&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/15.png&#34; alt=&#34;img&#34; style=&#34;zoom: 20%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;因为逆时针和顺时针旋转会得到不一样的旋转矩阵，所以我们统一如下：&lt;/p&gt;
+&lt;p&gt;绕 $X$ 轴的主动旋转定义为（$\theta_x$ 是&lt;code&gt;roll&lt;/code&gt;角 ）：
+$$
+R(X_A, \theta_x) =
+\begin{bmatrix}
+1 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; \cos \theta_x &amp;amp; - \sin \theta_x \\
+0 &amp;amp; \sin \theta_x &amp;amp; \cos \theta_x
+\end{bmatrix} =
+\exp \left ( \theta_x
+\begin{bmatrix}
+0 &amp;amp; 0 &amp;amp; 0\\
+0 &amp;amp; 0 &amp;amp; -1\\
+0 &amp;amp; 1 &amp;amp; 0
+\end{bmatrix}
+\right )
+$$
+绕 $Y$ 轴的主动旋转定义为（$\theta_y$ 是&lt;code&gt;pitch&lt;/code&gt;角）：
+$$
+R(Y_A, \theta_y) =
+\begin{bmatrix}
+\cos \theta_y &amp;amp; 0 &amp;amp; \sin \theta_y \\
+0 &amp;amp; 1 &amp;amp; 0 \\ - \sin \theta_y &amp;amp; 0 &amp;amp; \cos \theta_y
+\end{bmatrix} =
+\exp \left ( \theta_y
+\begin{bmatrix}
+0 &amp;amp; 0 &amp;amp; 1\\
+0 &amp;amp; 0 &amp;amp; 0\\ -1 &amp;amp; 0 &amp;amp; 0
+\end{bmatrix}
+\right )
+$$
+绕 $Z$ 轴的主动旋转定义为（$\theta_z$ 是&lt;code&gt;yaw&lt;/code&gt;角）：
+$$
+R(Z_A, \theta_z) =
+\begin{bmatrix}
+\cos \theta_z &amp;amp; - \sin \theta_z &amp;amp; 0 \\
+\sin \theta_z &amp;amp; \cos \theta_z &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1
+\end{bmatrix} =
+\exp \left ( \theta_y
+\begin{bmatrix}
+0 &amp;amp; -1 &amp;amp; 0\\
+1 &amp;amp; 0 &amp;amp; 0\\
+0 &amp;amp; 0 &amp;amp; 0
+\end{bmatrix}
+\right )
+$$
+将上述三个旋转矩阵结合起来，最终的旋转矩阵（设绕 $X, Y, Z$ 轴旋转的角度分别为 $\alpha, \beta, \gamma$）：
+$$
+\begin{array}{ll}
+M(\alpha, \beta, \gamma) &amp;amp; = R_x(\alpha) R_y(\beta) R_z(\gamma) \\
+&amp;amp; =
+\begin{bmatrix}
+1 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; \cos \alpha &amp;amp; - \sin \alpha \\
+0 &amp;amp; \sin \alpha &amp;amp; \cos \alpha
+\end{bmatrix}
+\begin{bmatrix}
+\cos \beta  &amp;amp; 0 &amp;amp; \sin \beta  \\
+0 &amp;amp; 1 &amp;amp; 0 \\ - \sin \beta  &amp;amp; 0 &amp;amp; \cos \beta
+\end{bmatrix}
+\begin{bmatrix}
+\cos \gamma &amp;amp; -\sin \gamma &amp;amp; 0 \\
+\sin \gamma &amp;amp; \cos \gamma &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1
+\end{bmatrix} \\
+&amp;amp; = \begin{bmatrix}
+\cos \gamma \cos \beta &amp;amp; - \sin \gamma \cos \alpha + \cos \gamma \sin \beta \sin \alpha &amp;amp; \sin \gamma \sin \alpha + \cos \gamma \sin \beta \cos \alpha \\
+\sin \gamma \cos \beta &amp;amp; \cos \gamma \cos \alpha + \sin \gamma \sin \beta \sin \alpha &amp;amp; - \cos \gamma \sin \alpha + \sin \gamma \sin \beta \cos \alpha \\ - \sin \beta &amp;amp; \cos \beta \sin \alpha &amp;amp; \cos \beta \cos \alpha
+\end{bmatrix}
+\end{array}
+$$&lt;/p&gt;
+&lt;p&gt;此时我们再加上平移向量 $T$ 便可完成从世界坐标系到相机坐标系的这个刚体变换了：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c
+\end{bmatrix} =
+\begin{bmatrix}
+r_{11} &amp;amp; r_{12} &amp;amp; r_{13} \\
+r_{21} &amp;amp; r_{22} &amp;amp; r_{23} \\
+r_{31} &amp;amp; r_{32} &amp;amp; r_{33}
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w
+\end{bmatrix} +
+\begin{bmatrix}
+t_x \\
+t_y \\
+t_z
+\end{bmatrix} =
+\mathbf{R}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w
+\end{bmatrix} + T
+$$&lt;/p&gt;
+&lt;p&gt;可进一步写成如下形式：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix} =
+\begin{bmatrix}
+\mathbf{R} &amp;amp; \mathbf{T} \\
+0_3^T &amp;amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w \\
+1
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;其中，$\mathbf{R}$ 和 $\mathbf{T}$ 便是相机外参。&lt;/p&gt;
+&lt;h3 id=&#34;相机内参&#34;&gt;相机内参
+&lt;/h3&gt;&lt;p&gt;首先考虑图像坐标系（$xy$）和像素坐标系（$uv$）之间的转换：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/8.png&#34;
+	width=&#34;369&#34;
+	height=&#34;245&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/8_hu_9f87285a95280818.png 480w, https://3000ye.com/p/camera-calibration/assets/8_hu_dfddc6288d181165.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;150&#34;
+		data-flex-basis=&#34;361px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;$$
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix}=
+\begin{bmatrix}
+\displaystyle \frac{1}{dx} &amp;amp; 0 &amp;amp; u_0 \\
+0 &amp;amp; \displaystyle \frac{1}{dy} &amp;amp; v_0 \\
+0 &amp;amp; 0 &amp;amp; 1
+\end{bmatrix}=
+\begin{bmatrix}
+x \\
+y \\
+1
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;$dx$ 表示一个像素点在 $x$ 方向的长度是多少毫米，$dy$ 表示一个像素点在 $y$ 方向的长度是多少毫米；$(u_0, v_0)$ 为图像的中心点。&lt;/p&gt;
+&lt;p&gt;然后考虑相机坐标系和图像坐标系之间的转换：&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/9.png&#34;
+	width=&#34;353&#34;
+	height=&#34;346&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/9_hu_44c35cb9499af1dd.png 480w, https://3000ye.com/p/camera-calibration/assets/9_hu_4193e46aa668811.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;102&#34;
+		data-flex-basis=&#34;244px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;$$
+\Delta ABO_c \sim \Delta oCO_c, \Delta PBO_c \sim \Delta pCO_c
+$$
+$$
+\displaystyle \frac{AB}{oC} = \frac{AO_c}{oO_c} = \frac{PB}{p C} = \frac{X_c}{x} = \frac{Z_c}{f} = \frac{Y_c}{y}
+$$
+$$
+x = f \displaystyle \frac{X_c}{Z_c}, y = f \frac{Y_c}{Z_c}
+$$&lt;/p&gt;
+&lt;p&gt;$$
+Z_c \begin{bmatrix}
+x \\
+y \\
+1
+\end{bmatrix}=
+\lambda
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix}=
+\begin{bmatrix}
+f &amp;amp; 0 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; f &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1 &amp;amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;其中，$f$ 是焦距，结合外参我们最终可以得到世界坐标系和像素坐标系之间的映射关系：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{array}{l}
+\lambda \begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix} &amp;amp; =
+\begin{bmatrix}
+\displaystyle \frac{1}{dx} &amp;amp; 0 &amp;amp; u_0 \\
+0 &amp;amp; \displaystyle \frac{1}{dy} &amp;amp; v_0 \\
+0 &amp;amp; 0 &amp;amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+f &amp;amp; 0 &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; f &amp;amp; 0 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1 &amp;amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{R} &amp;amp; \mathbf{T} \\
+0 &amp;amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w \\
+1
+\end{bmatrix}\\
+&amp;amp; =
+\begin{bmatrix}
+fx &amp;amp; 0 &amp;amp; u_0 &amp;amp; 0 \\
+0 &amp;amp; fy &amp;amp; v_0 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1 &amp;amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{R} &amp;amp; \mathbf{T} \\
+0 &amp;amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w \\
+1
+\end{bmatrix}
+\end{array}
+$$
+其中，相机内参为（不考虑图像传感器的特性）：
+$$
+\begin{bmatrix}
+fx &amp;amp; 0 &amp;amp; u_0 &amp;amp; 0 \\
+0 &amp;amp; fy &amp;amp; v_0 &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1 &amp;amp; 0
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;其中，$f_x, f_y$ 即为焦距的物理距离在像素坐标系中的长度，相机内参标定主要是标定相机的焦距、主点、歪斜等内部参数。&lt;/p&gt;
+&lt;h2 id=&#34;可能存在的影响&#34;&gt;可能存在的影响
+&lt;/h2&gt;&lt;h3 id=&#34;主点偏移&#34;&gt;主点偏移
+&lt;/h3&gt;&lt;p&gt;主点是光轴和相机成像平面的交点，在理想情况下，图像坐标系和相机坐标系原点重合，不存在坐标系偏移。但在实际情况中，图像坐标系往往在图片的左上角，光轴过图像中心，因此图像坐标系和相机坐标系不重合。两个坐标系之间存在一个平移运动：&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+    &lt;img src=&#34;assets/v2-d05b86c51be4aec5c412e2ca74afaf22_1440w.png&#34; alt=&#34;img&#34; style=&#34;zoom: 67%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;考虑主点偏移后，图像坐标和3D在相机坐标系的关系为：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{matrix}
+u = f \frac{X}{Z} + O_x \\
+v = f \frac{X}{Z} + O_y
+\end{matrix}
+$$
+此时，透视投影模型（像素坐标系和相机坐标系）的关系为：
+$$
+\lambda
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix} =
+\begin{bmatrix}
+f &amp;amp; 0 &amp;amp; O_x &amp;amp; 0 \\
+0 &amp;amp; f &amp;amp; O_x &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1 &amp;amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;仔细观察就会发现，该关系与上面提到的关系是等价的，只不过上面使用坐标 $(u_0, v_0)$ 来代表偏移量 $(O_x, O_y)$。&lt;/p&gt;
+&lt;h3 id=&#34;图像传感器特征&#34;&gt;图像传感器特征
+&lt;/h3&gt;&lt;p&gt;图像传感器像原尺寸在制造过程可能不是正方形，同时可能存在歪斜（skewed），因此需要考虑这些影响因素，传感器歪斜和不是正方形主要对相机 $x$ 和 $y$ 方向的焦距产生影响。&lt;/p&gt;
+&lt;div style=&#34;display: flex; justify-content: center;&#34;&gt;
+&lt;img src=&#34;assets/v2-a812da34b739588fa9142c46839ad281_1440w.png&#34; alt=&#34;img&#34; style=&#34;zoom: 50%;&#34; /&gt;
+&lt;/div&gt;
+&lt;p&gt;此时，透视投影模型（像素坐标系和相机坐标系）的关系为：
+$$
+\lambda
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix} =
+\begin{bmatrix}
+f &amp;amp; s &amp;amp; O_x &amp;amp; 0 \\
+0 &amp;amp; \eta f &amp;amp; O_x &amp;amp; 0 \\
+0 &amp;amp; 0 &amp;amp; 1 &amp;amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix} = [K, 0_3] P
+$$
+其中，$K$ 矩阵即为最终的内参矩阵。&lt;/p&gt;
+&lt;h3 id=&#34;镜头畸变&#34;&gt;镜头畸变
+&lt;/h3&gt;&lt;p&gt;小孔成像模型虽然充分考虑了相机内部参数对成像的影响，但没有考虑成像系统另一个重要的部分，镜头。镜头常用的有普通镜头、广角镜头、鱼眼镜头等，在无人驾驶和视觉slam领域，鱼眼镜头和广角镜头用的很多，主要是视角很大，可以观测到更多的信息。任何镜头都存在不同程度的畸变，不同类型的镜头用到的畸变模型也不相同。&lt;/p&gt;
+&lt;p&gt;在几何光学和阴极射线管（CRT）显示中，畸变（distortion）是对直线投影的一种偏移。简单来说直线投影是场景内的一条直线投影到图片上也保持为一条直线。那畸变简单来说就是一条直线投影到图片上不能保持为一条直线了，这是一种光学畸变。畸变一般可以分为两大类，包括&lt;strong&gt;径向畸变（radial distortion）&lt;strong&gt;和&lt;/strong&gt;切向畸变（tangential distortion）&lt;/strong&gt;。&lt;/p&gt;
+&lt;p&gt;径向畸变来自于透镜形状，主要是由于透镜不同部位放大倍率不同造成的。切向畸变来自于整个相机的组装过程，主要是由于透镜安装与成像平面不平行造成的。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/10.png&#34;
+	width=&#34;456&#34;
+	height=&#34;300&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/10_hu_c4be30cad665993a.png 480w, https://3000ye.com/p/camera-calibration/assets/10_hu_20d6f5f799836763.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;152&#34;
+		data-flex-basis=&#34;364px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;h4 id=&#34;径向畸变&#34;&gt;径向畸变
+&lt;/h4&gt;&lt;p&gt;透过镜头边缘的光线很容易产生径向畸变，这种现象来源于“筒形”或“鱼眼”的影响。光线离镜头中心越远，畸变越大。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/v2-d76fefc82f8dfa9361518b34d4e0e911_1440w.png&#34;
+	width=&#34;765&#34;
+	height=&#34;248&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/v2-d76fefc82f8dfa9361518b34d4e0e911_1440w_hu_9d8a8b0b134446f9.png 480w, https://3000ye.com/p/camera-calibration/assets/v2-d76fefc82f8dfa9361518b34d4e0e911_1440w_hu_d17c02055047d06e.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;308&#34;
+		data-flex-basis=&#34;740px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;从图像可以看出，径向畸变以某一个中心往外延伸，且越往外，畸变越大；显然畸变与距离成一种非线性的变换关系，参考众多文献，可以用多项式来近似：
+$$
+\begin{matrix}
+x_{rcrt} = x(1 + k_1 r^2 + k_2 r^4 + k_3 r^6) \\\\
+y_{rcrt} = y(1 + k_1 r^2 + k_2 r^4 + k_3 r^6)
+\end{matrix}
+$$
+其中，$x, y$ 是归一化的图像坐标，即坐标原点已经移动到主点，并且像素坐标除以焦距。$k_1, k_2, k_3$ 是径向畸变系数，$r^2 = x^2 + y^2$。&lt;/p&gt;
+&lt;h4 id=&#34;切向畸变&#34;&gt;切向畸变
+&lt;/h4&gt;&lt;p&gt;切向畸变主要发生在相机sensor和镜头不平行的情况下；因为有夹角，所以光透过镜头传到图像传感器上时，成像位置发生了变化。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/11.png&#34;
+	width=&#34;926&#34;
+	height=&#34;385&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/11_hu_d433edc6c4b7271e.png 480w, https://3000ye.com/p/camera-calibration/assets/11_hu_c733864f611baebd.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;240&#34;
+		data-flex-basis=&#34;577px&#34;
+	
+&gt;
+$$
+\begin{matrix}
+x_{tcrt} = x + [2p_1 xy + p_2 (r^2 + 2 x^2)] \\\\
+y_{tcrt} = y + [2p_2 xy + p_1 (r^2 + 2 y^2)]
+\end{matrix}
+$$
+其中，$x, y$ 是归一化的图像坐标，即坐标原点已经移动到主点，并且像素坐标除以焦距。$p_1, p_2$ 是切向畸变系数，$r^2 = x^2 + y^2$。&lt;/p&gt;
+&lt;h3 id=&#34;消除镜头畸变&#34;&gt;消除镜头畸变
+&lt;/h3&gt;&lt;p&gt;考虑镜头畸变前，我们可以将相机标定简单描述为以下过程：像素坐标 $(u_{ccd}, v_{ccd})$ $\to$ 图像坐标 $(x, y)$ $\to$ 相机坐标 $(X_c, Y_c, Z_c)$ $\to$ 世界坐标 $(X_w, Y_w, Z_w)$。&lt;/p&gt;
+&lt;p&gt;此时我们考虑加入镜头畸变：
+$$
+\begin{matrix}
+x_{crt} = x_{rcrt} + x_{tcrt} \\\\
+y_{crt} = y_{rcrt} + y_{tcrt}
+\end{matrix}
+$$
+得到消除镜头畸变的相机标定流程：像素坐标 $(u_{ccd - crt}, v_{ccd - crt})$ $\to$ 图像坐标 $(x_{crt}, y_{crt})$ $\to$ 相机坐标 $(X_c, Y_c, Z_c)$ $\to$ 世界坐标 $(X_w, Y_w, Z_w)$。&lt;/p&gt;
+&lt;h2 id=&#34;标定板的作用&#34;&gt;标定板的作用
+&lt;/h2&gt;&lt;h3 id=&#34;相机标定中的参数&#34;&gt;相机标定中的参数
+&lt;/h3&gt;&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio.png&#34;
+	width=&#34;1568&#34;
+	height=&#34;716&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b04ff5d1e7a1a51e.png 480w, https://3000ye.com/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b5f60b8ddd2d3fb1.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;相机标定&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;218&#34;
+		data-flex-basis=&#34;525px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;针孔相机模型中，只要确定这9个参数就可以唯一的确定针孔相机模型：&lt;/p&gt;
+&lt;p&gt;$$
+f_x,f_y,O_x,O_y,k_1,k_2,k_3,p_1,p_2
+$$&lt;/p&gt;
+&lt;p&gt;这个过程就称为「相机标定」，其中前4个我们称为内参数，后5个称为畸变参数，畸变参数是为了补充内参的。所以一旦相机结构固定，包括镜头结构固定，对焦距离固定，我们就可以用这9个的参数去近似这个相机。这里说的「镜头结构固定」，按我个人的理解，除了焦距固定之外，也应当包含光圈固定，因为改变光圈的大小，除了景深之外，是有可能改变针孔相机模型中的光心位置，但是影响并不是很大。这意味着标定好的相机如果改变光圈大小，会使得标定误差变大但应该不会大到难以接受的地步。&lt;/p&gt;
+&lt;p&gt;对于针孔相机本身需要拟合的方程如下：&lt;/p&gt;
+&lt;p&gt;$$
+\begin{bmatrix}
+u_{ccd - crt} * Z\\
+v_{ccd - crt} * Z\\
+Z
+\end{bmatrix} =
+J(k_1, k_2, k_3, p_1, p_2)
+\begin{bmatrix}
+f_x &amp;amp; 0 &amp;amp; O_x \\
+0 &amp;amp; f_y &amp;amp; O_y \\
+0 &amp;amp; 0 &amp;amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X \\
+Y \\
+X
+\end{bmatrix}
+$$&lt;/p&gt;
+&lt;p&gt;因此，我们现在的任务就是找出一大堆具有对应关系的像点 ${(u_{ccd - crt}, v_{ccd - crt}) ^T }$ 和物点 ${ (X, Y, Z)^T }$ 的点作为样本，来训练出模型的参数。这里就引发了两个问题：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;这么多像点和物点如何匹配？&lt;/li&gt;
+&lt;li&gt;即便现在知道物点的位置，如何用相机坐标系来表达物点的位置 $(X, Y, Z)$？&lt;/li&gt;
+&lt;/ul&gt;
+&lt;p&gt;为了解决上述问题，标定板应运而生。标定板的一大作用，确定物点和像点的对应性。这里用到的原理主要是「透视不变性」，打个比方，你近看一个人和远看一个人，虽然他的鼻子大小变了，你看鼻子的视角也变了，但是拓扑结构肯定是不变的，你也不可能把鼻子看成是嘴巴。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/v2-c6f1ebb7bfbef57c665546683b283de1_1440w.png&#34;
+	width=&#34;803&#34;
+	height=&#34;363&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/v2-c6f1ebb7bfbef57c665546683b283de1_1440w_hu_16a50ef39326671d.png 480w, https://3000ye.com/p/camera-calibration/assets/v2-c6f1ebb7bfbef57c665546683b283de1_1440w_hu_163bb58b92dacbf1.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;221&#34;
+		data-flex-basis=&#34;530px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;所以在标定板中，印刷了拓扑结构，广泛应用的是棋盘格和圆点格，这两种之所以成为主流，不仅是因为它们的拓扑结构明确且均匀，更重要的是检测其拓扑结构的算法简单且有效。棋盘格检测的是角点，只要对拍摄到的棋盘格图像横纵两个方向计算梯度就可获得；而圆点格的检测只需要对拍摄到的圆点格图样计算质心即可。假如你开发了一套非常完美的检测人脸全部特征的算法，你完全可以用你的照片当作标定板。&lt;/p&gt;
+&lt;p&gt;按照我的经验，圆点格的效果应该是好于棋盘格，因为圆点质心的「透视不变性」要比棋盘格的角点稳定的多。下图是同样尺寸、同样比例棋盘格和圆点在最大重投影误差处的误差对比，红色十字是提取的角点/质心，绿色圆圈是针孔相机模型计算出来认为的角点/质心位置。&lt;/p&gt;
+&lt;p&gt;但是圆点格的检测似乎是Halcon的专利（存疑），因此OpenCV和Matlab标定工具箱用的是棋盘格，要用圆点格得要自己写算法。下文中提到的标定板说的都是棋盘格。&lt;/p&gt;
+&lt;p&gt;标定板的第二大作用是把标定板中的角点变换到相机坐标系下的坐标 $(X, Y, Z)$。对于标定的初学者来说，很容易忽略的一点是标定板是具有标定板坐标系的。换句话说，标定板中的每个角点，在标定板坐标系下的位置是确定并且是已知的。&lt;/p&gt;
+&lt;p&gt;&lt;img src=&#34;https://3000ye.com/p/camera-calibration/assets/v2-67b8737534163cb960564df54e4361cb_1440w.png&#34;
+	width=&#34;447&#34;
+	height=&#34;404&#34;
+	srcset=&#34;https://3000ye.com/p/camera-calibration/assets/v2-67b8737534163cb960564df54e4361cb_1440w_hu_6bebaf6d7304883d.png 480w, https://3000ye.com/p/camera-calibration/assets/v2-67b8737534163cb960564df54e4361cb_1440w_hu_8cae43f4d167e8c9.png 1024w&#34;
+	loading=&#34;lazy&#34;
+	
+		alt=&#34;img&#34;
+	
+	
+		class=&#34;gallery-image&#34; 
+		data-flex-grow=&#34;110&#34;
+		data-flex-basis=&#34;265px&#34;
+	
+&gt;&lt;/p&gt;
+&lt;p&gt;而标定板坐标系变换到相机坐标系的变换矩阵，我们称它的元素为外参数。&lt;/p&gt;
+&lt;h3 id=&#34;如何使用标定板&#34;&gt;如何使用标定板
+&lt;/h3&gt;&lt;p&gt;如果用OpenCV或Matlab标定工具箱进行标定，需要给出棋盘格的物理尺寸，这其实就是在建立标定板坐标系，从测量的角度讲，标定板的精度是相机标定精度的基准，是误差传递链上的第一个环节。所以为了使针孔相机模型更逼近真实相机，对标定板的质量有以下要求（按重要性顺序）：&lt;/p&gt;
+&lt;ul&gt;
+&lt;li&gt;标定板的平面度高，棋盘格是直角。&lt;/li&gt;
+&lt;li&gt;标定板每个格子尺寸的高一致性。&lt;/li&gt;
+&lt;li&gt;真实尺寸与标称尺寸的差异小。&lt;/li&gt;
+&lt;/ul&gt;
+</description>
+        </item>
+        
+    </channel>
+</rss>

@@ -1,0 +1,1188 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="Sequence Container">
+<title>C&#43;&#43; Primer Ch09</title>
+
+<link rel='canonical' href='https://3000ye.com/p/c-primer-ch09/'>
+
+<link rel="stylesheet" href="/scss/style.min.483080122f2e85672d458d7b78ecc6cfba78b75cf7e286ad1ff73637a89c71f5.css"><meta property='og:title' content="C++ Primer Ch09">
+<meta property='og:description' content="Sequence Container">
+<meta property='og:url' content='https://3000ye.com/p/c-primer-ch09/'>
+<meta property='og:site_name' content='3000ye&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='CPP' /><meta property='article:tag' content='C&#43;&#43; Primer' /><meta property='article:published_time' content='2023-12-10T15:58:28&#43;08:00'/><meta property='article:modified_time' content='2023-12-10T15:58:28&#43;08:00'/><meta property='og:image' content='https://3000ye.com/p/c-primer-ch09/assets/c&#43;&#43;primer.jpg' />
+<meta name="twitter:title" content="C++ Primer Ch09">
+<meta name="twitter:description" content="Sequence Container"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://3000ye.com/p/c-primer-ch09/assets/c&#43;&#43;primer.jpg' />
+    <link rel="shortcut icon" href="/CC.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/CC_hu_f7a8683a4d1947d5.jpg" width="300"
+                            height="365" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">3000ye&#39;s Blog</a></h1>
+            <h2 class="site-description">Let life be beautiful like summer flowers.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/3000ye'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:castor_ye@163.com'
+                        target="_blank"
+                        title="Email"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+  <path d="M3 7l9 6l9 -6" />
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/44756427?spm_id_from=333.1007.0.0'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 10a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-6z" />
+  <path d="M8 3l2 3" />
+  <path d="M16 3l-2 3" />
+  <path d="M9 13v-2" />
+  <path d="M15 11v2" />
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='http://code.3000ye.com'
+                        target="_blank"
+                        title="LeetCode"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-leetcode" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 13h7.5" /><path d="M9.424 7.268l4.999 -4.999" /><path d="M16.633 16.644l-2.402 2.415a3.189 3.189 0 0 1 -4.524 0l-3.77 -3.787a3.223 3.223 0 0 1 0 -4.544l3.77 -3.787a3.189 3.189 0 0 1 4.524 0l2.302 2.313" /></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/stars/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-star" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
+</svg>
+                
+                <span>Stars</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#顺序容器概述">顺序容器概述</a></li>
+    <li><a href="#容器库概念">容器库概念</a>
+      <ol>
+        <li><a href="#类型">类型</a></li>
+        <li><a href="#构造函数">构造函数</a></li>
+        <li><a href="#赋值和swap">赋值和<code>swap</code></a></li>
+        <li><a href="#大小">大小</a></li>
+        <li><a href="#添加元素">添加元素</a></li>
+        <li><a href="#访问元素">访问元素</a></li>
+        <li><a href="#删除元素">删除元素</a></li>
+        <li><a href="#特殊的-forwad_list操作">特殊的 <code>forwad_list</code>操作</a></li>
+        <li><a href="#改变容器大小">改变容器大小</a></li>
+        <li><a href="#获取迭代器">获取迭代器</a></li>
+        <li><a href="#反向容器的额外成员">反向容器的额外成员</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/c-primer-ch09/">
+                <img src="/p/c-primer-ch09/assets/c&#43;&#43;primer_hu_8f05d1763fb902d8.jpg"
+                        srcset="/p/c-primer-ch09/assets/c&#43;&#43;primer_hu_8f05d1763fb902d8.jpg 800w, /p/c-primer-ch09/assets/c&#43;&#43;primer_hu_143373e1637e717f.jpg 1600w"
+                        width="800" 
+                        height="1044" 
+                        loading="lazy"
+                        alt="Featured image of post C&#43;&#43; Primer Ch09" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+    <header class="article-category">
+        
+            <a href="/categories/c&#43;&#43;-primer/" style="background-color: #2a9d8f; color: #fff;">
+                C&#43;&#43; Primer
+            </a>
+        
+    </header>
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/c-primer-ch09/">C&#43;&#43; Primer Ch09</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            Sequence Container
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Dec 10, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    7 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="顺序容器">顺序容器
+</h1><p>一个容器就是一些特定类型对象的集合，<strong>顺序容器（sequence container）</strong> 为程序员提供了控制元素存储和访问顺序的能力。</p>
+<h2 id="顺序容器概述">顺序容器概述
+</h2><p>下面列出了标准库中的顺序容器，不同容器有不同的性能折中：</p>
+<ul>
+<li>想容器添加或从容器删除元素的代价。</li>
+<li>非顺序访问容器中元素的代价。</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>容器类型</th>
+          <th>介绍</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>vector</code></td>
+          <td>可变大小数组。支持快速随机访问。在尾部之外的位置插入或删除元素可能很慢。</td>
+      </tr>
+      <tr>
+          <td><code>deque</code></td>
+          <td>双端队列。支持快速随机访问。在头尾位置插入/删除速度很快。</td>
+      </tr>
+      <tr>
+          <td><code>list</code></td>
+          <td>双向链表。只支持双向顺序访问。在<code>list</code>中任何位置进行插入/删除操作速度都很快。</td>
+      </tr>
+      <tr>
+          <td><code>forward_list</code></td>
+          <td>单向链表。只支持单向顺序访问。在链表任何位置进行插入/删除操作速度都很快。</td>
+      </tr>
+      <tr>
+          <td><code>array</code></td>
+          <td>固定大小数组。支持快速随机访问。不能添加或者删除元素。</td>
+      </tr>
+      <tr>
+          <td><code>string</code></td>
+          <td>与<code>vector</code>相似的容器，但专门用于保存字符。随机访问块。在尾部插入/删除速度快。</td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>除了固定大小的 <code>array</code> 外，其他容器都提供高效、灵活的内存管理。</li>
+<li>通常使用 <code>vector</code> 是最好的选择，除非你有很好的理由选择其他容器。</li>
+<li>如果程序中有很多小的元素，且空间的额外开销很重要，则不要使用 <code>list</code> 或 <code>forward_list</code>。</li>
+<li>如果程序要求随记访问元素，应使用 <code>vector</code> 或 <code>deque</code>。</li>
+<li>如果程序要求在容器的中间插入或删除元素，应使用 <code>list</code> 或 <code>forward_list</code>。</li>
+<li>如果程序需要再头尾位置插入或删除元素，但不会再中间位置进行操作，应使用 <code>deque</code>。</li>
+</ul>
+<h2 id="容器库概念">容器库概念
+</h2><p>容器类型操作上形成了一种层次：</p>
+<ul>
+<li>某些操作是所有容器类型都提供的。</li>
+<li>另一些操作仅针对顺序容器、关联容器或无序容器。</li>
+</ul>
+<h3 id="类型">类型
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>iterator</code></td>
+          <td>此容器类型的迭代器类型</td>
+      </tr>
+      <tr>
+          <td><code>const_iterator</code></td>
+          <td>可以读取元素但不能修改元素的迭代器类型</td>
+      </tr>
+      <tr>
+          <td><code>size_type</code></td>
+          <td>无符号整数类型，足够保存此种容器类型最大可能的大小</td>
+      </tr>
+      <tr>
+          <td><code>difference_type</code></td>
+          <td>带符号整数类型，足够保存两个迭代器之间的距离</td>
+      </tr>
+      <tr>
+          <td><code>value_type</code></td>
+          <td>元素类型</td>
+      </tr>
+      <tr>
+          <td><code>reference</code></td>
+          <td>元素的左值类型；和<code>value_type &amp;</code>含义相同</td>
+      </tr>
+      <tr>
+          <td><code>const_reference</code></td>
+          <td>元素的<code>const</code>左值类型，即<code>const value_type &amp;</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="构造函数">构造函数
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>C c;</code></td>
+          <td>默认构造函数，构造空容器</td>
+      </tr>
+      <tr>
+          <td><code>C c1(c2);</code>或<code>C c1 = c2;</code></td>
+          <td>构造<code>c2</code>的拷贝<code>c1</code></td>
+      </tr>
+      <tr>
+          <td><code>C c(b, e)</code></td>
+          <td>构造<code>c</code>，将迭代器<code>b</code>和<code>e</code>指定范围内的所有元素拷贝到<code>c</code></td>
+      </tr>
+      <tr>
+          <td><code>C c(a, b, c...)</code></td>
+          <td>列表初始化<code>c</code></td>
+      </tr>
+      <tr>
+          <td><code>C c(n)</code></td>
+          <td>只支持顺序容器，且不包括<code>array</code>，包含<code>n</code>个元素，这些元素进行了值初始化</td>
+      </tr>
+      <tr>
+          <td><code>C c(n, t)</code></td>
+          <td>包含<code>n</code>个初始值为<code>t</code>的元素</td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>只有顺序容器的构造函数才接受大小参数，关联容器并不支持。</li>
+<li><code>array</code>具有固定大小。</li>
+<li>和其他容器不同，默认构造的<code>array</code>是非空的。</li>
+<li>直接复制：将一个容器复制给另一个容器时，类型必须匹配：容器类型和元素类型都必须相同。</li>
+<li>使用迭代器复制：不要求容器类型相同，容器内的元素类型也可以不同。</li>
+</ul>
+<h3 id="赋值和swap">赋值和<code>swap</code>
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>c1 = c2;</code></td>
+          <td>将<code>c1</code>中的元素替换成<code>c2</code>中的元素</td>
+      </tr>
+      <tr>
+          <td><code>c1 = {a, b, c...}</code></td>
+          <td>将<code>c1</code>中的元素替换成列表中的元素（不适用于<code>array</code>）</td>
+      </tr>
+      <tr>
+          <td><code>c1.swap(c2)</code></td>
+          <td>交换<code>c1</code>和<code>c2</code>的元素</td>
+      </tr>
+      <tr>
+          <td><code>swap(c1, c2)</code></td>
+          <td>等价于<code>c1.swap(c2)</code></td>
+      </tr>
+      <tr>
+          <td><code>c.assign(b, e)</code></td>
+          <td>将<code>c</code>中的元素替换成迭代器<code>b</code>和<code>e</code>表示范围中的元素，<code>b</code>和<code>e</code>不能指向<code>c</code>中的元素</td>
+      </tr>
+      <tr>
+          <td><code>c.assign(il)</code></td>
+          <td>将<code>c</code>中的元素替换成初始化列表<code>il</code>中的元素</td>
+      </tr>
+      <tr>
+          <td><code>c.assign(n, r)</code></td>
+          <td>将<code>c</code>中的元素替换为<code>n</code>个值是<code>t</code>的元素</td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>使用非成员版本的<code>swap</code>是一个好习惯。</li>
+<li><code>assign</code>操作不适用于关联容器和<code>array</code></li>
+</ul>
+<h3 id="大小">大小
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>c.size()</code></td>
+          <td><code>c</code>中元素的数目（不支持<code>forward_list</code>）</td>
+      </tr>
+      <tr>
+          <td><code>c.max_size()</code></td>
+          <td><code>c</code>中可保存的最大元素数目</td>
+      </tr>
+      <tr>
+          <td><code>c.empty()</code></td>
+          <td>若<code>c</code>中存储了元素，返回<code>false</code>，否则返回<code>true</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="添加元素">添加元素
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>c.push_back(t)</code></td>
+          <td>在<code>c</code>尾部创建一个值为<code>t</code>的元素，返回<code>void</code></td>
+      </tr>
+      <tr>
+          <td><code>c.emplace_back(args)</code></td>
+          <td>同上</td>
+      </tr>
+      <tr>
+          <td><code>c.push_front(t)</code></td>
+          <td>在<code>c</code>头部创建一个值为<code>t</code>的元素，返回<code>void</code></td>
+      </tr>
+      <tr>
+          <td><code>c.emplace_front(args)</code></td>
+          <td>同上</td>
+      </tr>
+      <tr>
+          <td><code>c.insert(p, t)</code></td>
+          <td>在迭代器<code>p</code>指向的元素之前创建一个值是<code>t</code>的元素，返回指向新元素的迭代器</td>
+      </tr>
+      <tr>
+          <td><code>c.emplace(p, args)</code></td>
+          <td>同上</td>
+      </tr>
+      <tr>
+          <td><code>c.insert(p, n, t)</code></td>
+          <td>在迭代器<code>p</code>指向的元素之前插入<code>n</code>个值为<code>t</code>的元素，返回指向第一个新元素的迭代器；如果<code>n</code>是0，则返回<code>p</code></td>
+      </tr>
+      <tr>
+          <td><code>c.insert(p, b, e)</code></td>
+          <td>将迭代器<code>b</code>和<code>e</code>范围内的元素，插入到<code>p</code>指向的元素之前；如果范围为空，则返回<code>p</code></td>
+      </tr>
+      <tr>
+          <td><code>c.insert(p, il)</code></td>
+          <td><code>il</code>是一个花括号包围中的元素值列表，将其插入到<code>p</code>指向的元素之前；如果<code>il</code>是空，则返回<code>p</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>因为这些操作会改变大小，因此不适用于<code>array</code>。</li>
+<li><code>forward_list</code>有自己专有版本的<code>insert</code>和<code>emplace</code>。</li>
+<li><code>forward_list</code>不支持<code>push_back</code>和<code>emplace_back</code>。</li>
+<li>当我们用一个对象去初始化容器或者将对象插入到容器时，实际上放入的是对象的拷贝。</li>
+<li><code>emplace</code>开头的函数是新标准引入的，这些操作是构造而不是拷贝元素。</li>
+<li>传递给<code>emplace</code>的参数必须和元素类型的构造函数相匹配。</li>
+</ul>
+<h3 id="访问元素">访问元素
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>c.back()</code></td>
+          <td>返回<code>c</code>中尾元素的引用。若<code>c</code>为空，函数行为未定义</td>
+      </tr>
+      <tr>
+          <td><code>c.front()</code></td>
+          <td>返回<code>c</code>中头元素的引用。若<code>c</code>为空，函数行为未定义</td>
+      </tr>
+      <tr>
+          <td><code>c[n]</code></td>
+          <td>返回<code>c</code>中下标是<code>n</code>的元素的引用，<code>n</code>时候一个无符号证书。若<code>n&gt;=c.size()</code>，则函数行为未定义</td>
+      </tr>
+      <tr>
+          <td><code>c.at(n)</code></td>
+          <td>返回下标为<code>n</code>的元素引用。如果下标越界，则抛出<code>out_of_range</code>异常</td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>访问成员函数返回的是引用。</li>
+<li><code>at</code>和下标操作只适用于<code>string</code>、<code>vector</code>、<code>deque</code>、<code>array</code>。</li>
+<li><code>back</code>不适用于<code>forward_list</code>。</li>
+<li>如果希望下标是合法的，可以使用<code>at</code>函数。</li>
+</ul>
+<h3 id="删除元素">删除元素
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>c.pop_back()</code></td>
+          <td>删除<code>c</code>中尾元素，若<code>c</code>为空，则函数行为未定义。函数返回<code>void</code></td>
+      </tr>
+      <tr>
+          <td><code>c.pop_front()</code></td>
+          <td>删除<code>c</code>中首元素，若<code>c</code>为空，则函数行为未定义。函数返回<code>void</code></td>
+      </tr>
+      <tr>
+          <td><code>c.erase(p)</code></td>
+          <td>删除迭代器<code>p</code>指向的元素，返回一个指向被删除元素之后的元素的迭代器，若<code>p</code>本身是尾后迭代器，则函数行为未定义</td>
+      </tr>
+      <tr>
+          <td><code>c.erase(b, e)</code></td>
+          <td>删除迭代器<code>b</code>和<code>e</code>范围内的元素，返回指向最后一个被删元素之后元素的迭代器，若<code>e</code>本身就是尾后迭代器，则返回尾后迭代器</td>
+      </tr>
+      <tr>
+          <td><code>c.clear()</code></td>
+          <td>删除<code>c</code>中所有元素，返回<code>void</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>会改变容器大小，不适用于<code>array</code>。</li>
+<li><code>forward_list</code>有特殊版本的<code>erase</code></li>
+<li><code>forward_list</code>不支持<code>pop_back</code></li>
+<li><code>vector</code>和<code>string</code>不支持<code>pop_front</code></li>
+</ul>
+<h3 id="特殊的-forwad_list操作">特殊的 <code>forwad_list</code>操作
+</h3><ul>
+<li>链表在删除元素时需要修改前置节点的内容，双向链表会前驱的指针，但是单向链表没有保存，因此需要增加获取前置节点的方法。</li>
+<li><code>forward_list</code>定义了<code>before_begin</code>，即首前（off-the-begining）迭代器，允许我们再在首元素之前添加或删除元素。</li>
+</ul>
+<div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>lst.before_begin()</code></td>
+          <td>返回指向链表首元素之前不存在的元素的迭代器，此迭代器不能解引用。</td>
+      </tr>
+      <tr>
+          <td><code>lst.cbefore_begin()</code></td>
+          <td>同上，但是返回的是常量迭代器。</td>
+      </tr>
+      <tr>
+          <td><code>lst.insert_after(p, t)</code></td>
+          <td>在迭代器<code>p</code>之后插入元素。<code>t</code>是一个对象</td>
+      </tr>
+      <tr>
+          <td><code>lst.insert_after(p, n, t)</code></td>
+          <td>在迭代器<code>p</code>之后插入元素。<code>t</code>是一个对象，<code>n</code>是数量。若<code>n</code>是0则函数行为未定义</td>
+      </tr>
+      <tr>
+          <td><code>lst.insert_after(p, b, e)</code></td>
+          <td>在迭代器<code>p</code>之后插入元素。由迭代器<code>b</code>和<code>e</code>指定范围。</td>
+      </tr>
+      <tr>
+          <td><code>lst.insert_after(p, il)</code></td>
+          <td>在迭代器<code>p</code>之后插入元素。由<code>il</code>指定初始化列表。</td>
+      </tr>
+      <tr>
+          <td><code>emplace_after(p, args)</code></td>
+          <td>使用<code>args</code>在<code>p</code>之后的位置，创建一个元素，返回一个指向这个新元素的迭代器。若<code>p</code>为尾后迭代器，则函数行为未定义。</td>
+      </tr>
+      <tr>
+          <td><code>lst.erase_after(p)</code></td>
+          <td>删除<code>p</code>指向位置之后的元素，返回一个指向被删元素之后的元素的迭代器，若<code>p</code>指向<code>lst</code>的尾元素或者是一个尾后迭代器，则函数行为未定义。</td>
+      </tr>
+      <tr>
+          <td><code>lst.erase_after(b, e)</code></td>
+          <td>类似上面，删除对象换成从<code>b</code>到<code>e</code>指定的范围。</td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="改变容器大小">改变容器大小
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>c.resize(n)</code></td>
+          <td>调整<code>c</code>的大小为<code>n</code>个元素，若<code>n&lt;c.size()</code>，则多出的元素被丢弃。若必须添加新元素，对新元素进行值初始化</td>
+      </tr>
+      <tr>
+          <td><code>c.resize(n, t)</code></td>
+          <td>调整<code>c</code>的大小为<code>n</code>个元素，任何新添加的元素都初始化为值<code>t</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<h3 id="获取迭代器">获取迭代器
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>c.begin()</code>, <code>c.end()</code></td>
+          <td>返回指向<code>c</code>的首元素和尾元素之后位置的迭代器</td>
+      </tr>
+      <tr>
+          <td><code>c.cbegin()</code>, <code>c.cend()</code></td>
+          <td>返回<code>const_iterator</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>以<code>c</code>开头的版本是C++11新标准引入的</li>
+<li>当不需要写访问时，应该使用<code>cbegin</code>和<code>cend</code>。</li>
+</ul>
+<h3 id="反向容器的额外成员">反向容器的额外成员
+</h3><div class="table-wrapper"><table>
+  <thead>
+      <tr>
+          <th>操作</th>
+          <th>解释</th>
+      </tr>
+  </thead>
+  <tbody>
+      <tr>
+          <td><code>reverse_iterator</code></td>
+          <td>按逆序寻址元素的迭代器</td>
+      </tr>
+      <tr>
+          <td><code>const_reverse_iterator</code></td>
+          <td>不能修改元素的逆序迭代器</td>
+      </tr>
+      <tr>
+          <td><code>c.rbegin()</code>, <code>c.rend()</code></td>
+          <td>返回指向<code>c</code>的尾元素和首元素之前位置的迭代器</td>
+      </tr>
+      <tr>
+          <td><code>c.crbegin()</code>, <code>c.crend()</code></td>
+          <td>返回<code>const_reverse_iterator</code></td>
+      </tr>
+  </tbody>
+</table></div>
+<ul>
+<li>不支持<code>forward_list</code></li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/cpp/">CPP</a>
+        
+            <a href="/tags/c&#43;&#43;-primer/">C&#43;&#43; Primer</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+<aside class="related-content--wrapper">
+    <h2 class="section-title">Related content</h2>
+    <div class="related-content">
+        <div class="flex article-list--tile">
+            
+                
+<article class="has-image">
+    <a href="/p/c-primer-ch08/">
+        
+        
+            <div class="article-image">
+                <img src="/p/c-primer-ch08/assets/c&#43;&#43;primer.7630d75c87dffb5ed3e54c23dd076a9d_hu_c3abe1253072387.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post C&#43;&#43; Primer Ch08"
+                        
+                        data-hash="md5-djDXXIff&#43;17T5Uwj3QdqnQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">C&#43;&#43; Primer Ch08</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/c-primer-ch07/">
+        
+        
+            <div class="article-image">
+                <img src="/p/c-primer-ch07/assets/c&#43;&#43;primer.7630d75c87dffb5ed3e54c23dd076a9d_hu_c3abe1253072387.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post C&#43;&#43; Primer Ch07"
+                        
+                        data-hash="md5-djDXXIff&#43;17T5Uwj3QdqnQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">C&#43;&#43; Primer Ch07</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/c-primer-ch06/">
+        
+        
+            <div class="article-image">
+                <img src="/p/c-primer-ch06/assets/c&#43;&#43;primer.7630d75c87dffb5ed3e54c23dd076a9d_hu_c3abe1253072387.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post C&#43;&#43; Primer Ch06"
+                        
+                        data-hash="md5-djDXXIff&#43;17T5Uwj3QdqnQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">C&#43;&#43; Primer Ch06</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/c-primer-ch04/">
+        
+        
+            <div class="article-image">
+                <img src="/p/c-primer-ch04/assets/c&#43;&#43;primer.7630d75c87dffb5ed3e54c23dd076a9d_hu_c3abe1253072387.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post C&#43;&#43; Primer Ch04"
+                        
+                        data-hash="md5-djDXXIff&#43;17T5Uwj3QdqnQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">C&#43;&#43; Primer Ch04</h2>
+        </div>
+    </a>
+</article>
+
+            
+                
+<article class="has-image">
+    <a href="/p/c-primer-ch03/">
+        
+        
+            <div class="article-image">
+                <img src="/p/c-primer-ch03/assets/c&#43;&#43;primer.7630d75c87dffb5ed3e54c23dd076a9d_hu_c3abe1253072387.jpg" 
+                        width="250" 
+                        height="150" 
+                        loading="lazy"
+                        alt="Featured image of post C&#43;&#43; Primer Ch03"
+                        
+                        data-hash="md5-djDXXIff&#43;17T5Uwj3QdqnQ==">
+                
+            </div>
+        
+
+        <div class="article-details">
+            <h2 class="article-title">C&#43;&#43; Primer Ch03</h2>
+        </div>
+    </a>
+</article>
+
+            
+        </div>
+    </div>
+</aside>
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2025 3000ye&#39;s Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>

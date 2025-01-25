@@ -1,0 +1,1269 @@
+<!DOCTYPE html>
+<html lang="en-us" dir="ltr">
+    <head><meta charset='utf-8'>
+<meta name='viewport' content='width=device-width, initial-scale=1'><meta name='description' content="The principle and specific implementation of camera calibration">
+<title>Camera Calibration</title>
+
+<link rel='canonical' href='https://3000ye.com/p/camera-calibration/'>
+
+<link rel="stylesheet" href="/scss/style.min.483080122f2e85672d458d7b78ecc6cfba78b75cf7e286ad1ff73637a89c71f5.css"><meta property='og:title' content="Camera Calibration">
+<meta property='og:description' content="The principle and specific implementation of camera calibration">
+<meta property='og:url' content='https://3000ye.com/p/camera-calibration/'>
+<meta property='og:site_name' content='3000ye&#39;s Blog'>
+<meta property='og:type' content='article'><meta property='article:section' content='Post' /><meta property='article:tag' content='Camera' /><meta property='article:published_time' content='2023-10-08T14:30:49&#43;00:00'/><meta property='article:modified_time' content='2023-10-08T14:30:49&#43;00:00'/><meta property='og:image' content='https://3000ye.com/p/camera-calibration/board.jpg' />
+<meta name="twitter:title" content="Camera Calibration">
+<meta name="twitter:description" content="The principle and specific implementation of camera calibration"><meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:image" content='https://3000ye.com/p/camera-calibration/board.jpg' />
+    <link rel="shortcut icon" href="/CC.ico" />
+
+    </head>
+    <body class="
+    article-page
+    ">
+    <script>
+        (function() {
+            const colorSchemeKey = 'StackColorScheme';
+            if(!localStorage.getItem(colorSchemeKey)){
+                localStorage.setItem(colorSchemeKey, "auto");
+            }
+        })();
+    </script><script>
+    (function() {
+        const colorSchemeKey = 'StackColorScheme';
+        const colorSchemeItem = localStorage.getItem(colorSchemeKey);
+        const supportDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches === true;
+
+        if (colorSchemeItem == 'dark' || colorSchemeItem === 'auto' && supportDarkMode) {
+            
+
+            document.documentElement.dataset.scheme = 'dark';
+        } else {
+            document.documentElement.dataset.scheme = 'light';
+        }
+    })();
+</script>
+<div class="container main-container flex on-phone--column extended"><aside class="sidebar left-sidebar sticky ">
+    <button class="hamburger hamburger--spin" type="button" id="toggle-menu" aria-label="Toggle Menu">
+        <span class="hamburger-box">
+            <span class="hamburger-inner"></span>
+        </span>
+    </button>
+
+    <header>
+        
+            
+            <figure class="site-avatar">
+                <a href="/">
+                
+                    
+                    
+                    
+                        
+                        <img src="/img/CC_hu_f7a8683a4d1947d5.jpg" width="300"
+                            height="365" class="site-logo" loading="lazy" alt="Avatar">
+                    
+                
+                </a>
+                
+            </figure>
+            
+        
+        
+        <div class="site-meta">
+            <h1 class="site-name"><a href="/">3000ye&#39;s Blog</a></h1>
+            <h2 class="site-description">Let life be beautiful like summer flowers.</h2>
+        </div>
+    </header><ol class="menu-social">
+            
+                <li>
+                    <a 
+                        href='https://github.com/3000ye'
+                        target="_blank"
+                        title="GitHub"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-github" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M9 19c-4.3 1.4 -4.3 -2.5 -6 -3m12 5v-3.5c0 -1 .1 -1.4 -.5 -2c2.8 -.3 5.5 -1.4 5.5 -6a4.6 4.6 0 0 0 -1.3 -3.2a4.2 4.2 0 0 0 -.1 -3.2s-1.1 -.3 -3.5 1.3a12.3 12.3 0 0 0 -6.2 0c-2.4 -1.6 -3.5 -1.3 -3.5 -1.3a4.2 4.2 0 0 0 -.1 3.2a4.6 4.6 0 0 0 -1.3 3.2c0 4.6 2.7 5.7 5.5 6c-.6 .6 -.6 1.2 -.5 2v3.5" />
+</svg>
+
+
+
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='mailto:castor_ye@163.com'
+                        target="_blank"
+                        title="Email"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-mail" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 7a2 2 0 0 1 2 -2h14a2 2 0 0 1 2 2v10a2 2 0 0 1 -2 2h-14a2 2 0 0 1 -2 -2v-10z" />
+  <path d="M3 7l9 6l9 -6" />
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='https://space.bilibili.com/44756427?spm_id_from=333.1007.0.0'
+                        target="_blank"
+                        title="Bilibili"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-bilibili" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M3 10a4 4 0 0 1 4 -4h10a4 4 0 0 1 4 4v6a4 4 0 0 1 -4 4h-10a4 4 0 0 1 -4 -4v-6z" />
+  <path d="M8 3l2 3" />
+  <path d="M16 3l-2 3" />
+  <path d="M9 13v-2" />
+  <path d="M15 11v2" />
+</svg>
+                        
+                    </a>
+                </li>
+            
+                <li>
+                    <a 
+                        href='http://code.3000ye.com'
+                        target="_blank"
+                        title="LeetCode"
+                        rel="me"
+                    >
+                        
+                        
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-brand-leetcode" width="24" height="24" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 13h7.5" /><path d="M9.424 7.268l4.999 -4.999" /><path d="M16.633 16.644l-2.402 2.415a3.189 3.189 0 0 1 -4.524 0l-3.77 -3.787a3.223 3.223 0 0 1 0 -4.544l3.77 -3.787a3.189 3.189 0 0 1 4.524 0l2.302 2.313" /></svg>
+                        
+                    </a>
+                </li>
+            
+        </ol><ol class="menu" id="main-menu">
+        
+        
+        
+        <li >
+            <a href='/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-home" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <polyline points="5 12 3 12 12 3 21 12 19 12" />
+  <path d="M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-7" />
+  <path d="M9 21v-6a2 2 0 0 1 2 -2h2a2 2 0 0 1 2 2v6" />
+</svg>
+
+
+
+                
+                <span>Home</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/archives/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-archive" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <rect x="3" y="4" width="18" height="4" rx="2" />
+  <path d="M5 8v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-10" />
+  <line x1="10" y1="12" x2="14" y2="12" />
+</svg>
+
+
+
+                
+                <span>Archives</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/search/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="10" cy="10" r="7" />
+  <line x1="21" y1="21" x2="15" y2="15" />
+</svg>
+
+
+
+                
+                <span>Search</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/about/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>About</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/friends/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-link" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M10 14a3.5 3.5 0 0 0 5 0l4 -4a3.5 3.5 0 0 0 -5 -5l-.5 .5" />
+  <path d="M14 10a3.5 3.5 0 0 0 -5 0l-4 4a3.5 3.5 0 0 0 5 5l.5 -.5" />
+</svg>
+
+
+
+                
+                <span>Friends</span>
+            </a>
+        </li>
+        
+        
+        <li >
+            <a href='/stars/' >
+                
+                
+                
+                    <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-star" width="44" height="44" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
+  <path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" />
+</svg>
+                
+                <span>Stars</span>
+            </a>
+        </li>
+        
+        <li class="menu-bottom-section">
+            <ol class="menu">
+
+                
+                    <li id="dark-mode-toggle">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-left" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="8" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-toggle-right" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="16" cy="12" r="2" />
+  <rect x="2" y="6" width="20" height="12" rx="6" />
+</svg>
+
+
+
+                        <span>Dark Mode</span>
+                    </li>
+                
+            </ol>
+        </li>
+    </ol>
+</aside>
+
+    <aside class="sidebar right-sidebar sticky">
+        
+            
+                
+    <section class="widget archives">
+        <div class="widget-icon">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-hash" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <line x1="5" y1="9" x2="19" y2="9" />
+  <line x1="5" y1="15" x2="19" y2="15" />
+  <line x1="11" y1="4" x2="7" y2="20" />
+  <line x1="17" y1="4" x2="13" y2="20" />
+</svg>
+
+
+
+        </div>
+        <h2 class="widget-title section-title">Table of contents</h2>
+        
+        <div class="widget--toc">
+            <nav id="TableOfContents">
+  <ol>
+    <li><a href="#何为相机标定">何为相机标定</a>
+      <ol>
+        <li><a href="#为什么需要标定">为什么需要标定</a></li>
+      </ol>
+    </li>
+    <li><a href="#相机标定的目的和意义">相机标定的目的和意义</a></li>
+    <li><a href="#相关术语">相关术语</a></li>
+    <li><a href="#相机标定原理模型">相机标定原理模型</a>
+      <ol>
+        <li><a href="#针孔相机模型">针孔相机模型</a></li>
+        <li><a href="#四个坐标系">四个坐标系</a></li>
+        <li><a href="#相机外参">相机外参</a></li>
+        <li><a href="#相机内参">相机内参</a></li>
+      </ol>
+    </li>
+    <li><a href="#可能存在的影响">可能存在的影响</a>
+      <ol>
+        <li><a href="#主点偏移">主点偏移</a></li>
+        <li><a href="#图像传感器特征">图像传感器特征</a></li>
+        <li><a href="#镜头畸变">镜头畸变</a>
+          <ol>
+            <li><a href="#径向畸变">径向畸变</a></li>
+            <li><a href="#切向畸变">切向畸变</a></li>
+          </ol>
+        </li>
+        <li><a href="#消除镜头畸变">消除镜头畸变</a></li>
+      </ol>
+    </li>
+    <li><a href="#标定板的作用">标定板的作用</a>
+      <ol>
+        <li><a href="#相机标定中的参数">相机标定中的参数</a></li>
+        <li><a href="#如何使用标定板">如何使用标定板</a></li>
+      </ol>
+    </li>
+  </ol>
+</nav>
+        </div>
+    </section>
+
+            
+        
+    </aside>
+
+
+            <main class="main full-width">
+    <article class="has-image main-article">
+    <header class="article-header">
+        <div class="article-image">
+            <a href="/p/camera-calibration/">
+                <img src="/p/camera-calibration/board_hu_e84a716c417fe41.jpg"
+                        srcset="/p/camera-calibration/board_hu_e84a716c417fe41.jpg 800w, /p/camera-calibration/board_hu_3277843324b107b2.jpg 1600w"
+                        width="800" 
+                        height="362" 
+                        loading="lazy"
+                        alt="Featured image of post Camera Calibration" />
+                
+            </a>
+        </div>
+    
+
+    <div class="article-details">
+    
+
+    <div class="article-title-wrapper">
+        <h2 class="article-title">
+            <a href="/p/camera-calibration/">Camera Calibration</a>
+        </h2>
+    
+        
+        <h3 class="article-subtitle">
+            The principle and specific implementation of camera calibration
+        </h3>
+        
+    </div>
+
+    
+    
+    
+    
+    <footer class="article-time">
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-calendar-time" width="56" height="56" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <path d="M11.795 21h-6.795a2 2 0 0 1 -2 -2v-12a2 2 0 0 1 2 -2h12a2 2 0 0 1 2 2v4" />
+  <circle cx="18" cy="18" r="4" />
+  <path d="M15 3v4" />
+  <path d="M7 3v4" />
+  <path d="M3 11h16" />
+  <path d="M18 16.496v1.504l1 1" />
+</svg>
+                <time class="article-time--published">Oct 08, 2023</time>
+            </div>
+        
+
+        
+            <div>
+                <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-clock" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <polyline points="12 7 12 12 15 15" />
+</svg>
+
+
+
+                <time class="article-time--reading">
+                    13 minute read
+                </time>
+            </div>
+        
+    </footer>
+    
+
+    
+</div>
+
+</header>
+
+    <section class="article-content">
+    
+    
+    <h1 id="由浅到深理解相机标定">由浅到深理解相机标定
+</h1><h2 id="何为相机标定">何为相机标定
+</h2><p>在图像测量过程以及机器视觉应用中，为确定空间无哦表面某点的三维几何位置与其在图像中对应点之间的相互关系，必须建立相机成像的几何模型，这些几何模型参数就是相机参数。</p>
+<p>在大多数条件下这些参数必须通过实验与计算才能得到，这个求解参数的过程就称之为<strong>相机标定（或摄像头标定）</strong>。</p>
+<p><strong>相机标定</strong>涉及的知识面很广：成像几何、镜头畸变、单应矩阵、非线性优化等。</p>
+<p><strong>相机标定</strong>有自标定（找图像中特征点）、标定板标定（特征点易求，稳定性好），一般采用标定板标定。</p>
+<p><strong>相机标定</strong>按照相机是否静止，可分为静态相机标定（标定板动，相机静止），动态相机标定（标定板静止，相机运动）。</p>
+<h3 id="为什么需要标定">为什么需要标定
+</h3><p>任何理论物理模型都是在特定假设上对真实事物的近似，然而在实际应用中存在误差，普通相机的成像模型也不例外（透视投影）。</p>
+<p>实际中，普通相机成像误差的主要来源有两部分：</p>
+<ul>
+<li>第一是sensor（传感器）制造产生的误差，比如sensor成像单元不是正方形，sensor歪斜。</li>
+<li>第二是镜头制造和安装产生的误差，镜头一般存在非线性的径向畸变；镜头与相机sensor安装不平行，还会产生切向畸变。</li>
+</ul>
+<h2 id="相机标定的目的和意义">相机标定的目的和意义
+</h2><p>我们所处的世界是三维的，而照片是二维的，这样我们可以把相机认为是一个函数，输入量是一个场景，输出量是一幅灰度图。这个从三维到二维的过程的函数是不可逆的。</p>
+<p>相机标定的目标是我们找一个合适的数学模型，求出这个模型的参数，这样我们能够近似这个三维到二维的过程，使这个三维到二维的过程的函数找到反函数。</p>
+<p><img src="/p/camera-calibration/assets/v2-afff3b4901966569a5203751afb5e50f_1440w.webp"
+	width="898"
+	height="615"
+	srcset="/p/camera-calibration/assets/v2-afff3b4901966569a5203751afb5e50f_1440w_hu_8ab535edc25aa531.webp 480w, /p/camera-calibration/assets/v2-afff3b4901966569a5203751afb5e50f_1440w_hu_da3bd67849419e37.webp 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="146"
+		data-flex-basis="350px"
+	
+></p>
+<p>这个逼近的过程就是「相机标定」，我们用简单的数学模型来表达复杂的成像过程，并且求出成像的反过程。标定之后的相机，可以进行三维场景的重建，即深度的感知。</p>
+<h2 id="相关术语">相关术语
+</h2><p><strong>焦点：<strong>在几何光学中有时也称为</strong>像点</strong>，是源头的光线经过物镜后汇聚的点。</p>
+<p><strong>焦距：<strong>也称为</strong>焦长</strong>，是光学系统中衡量光的聚集或发散的度量方式，指从透镜中心到光聚集之焦点的距离。亦是照相机中，从镜片光学中心到底片、CCD或CMOS等成像平面的距离。</p>
+<p>正透镜、负透镜、凹面镜和凸面镜的焦点<code>F</code>和焦距<code>f</code>：</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/1.png" alt="img" style="zoom:50%;" />
+</div>
+<p><strong>镜头（Lenses）</strong>：是将拍摄景物在传感器上成像的器件，它通常由几片透镜、光圈叶片、对焦马达等光学元件组成。</p>
+<p><strong>传感器（Sensor）</strong>：是摄像头组成的核心，其作用是作为相机的感光元件。摄像头传感器主要有两种，一种是CCD传感器，一种是CMOS传感器，两者区别在于：CCD的优势在于成像质量好，但是由于制造工艺复杂，成本居高不下，特别是大型CCD，价格非常高昂。在相同分辨率下，CMOS价格比CCD便宜，但是CMOS器件产生的图像质量相比CCD来说要低一些。</p>
+<p><strong>光心</strong>：凸透镜近轴光线中，入射线和与其对应且相平行的出射线构成共轭光线，其入射点跟出射点的连线与主光轴的交点，称为凸透镜的焦点，位于透镜中央的点叫光心。</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/3.png" alt="img" style="zoom:50%;" />
+</div>
+<p>从图中可知，<code>O</code>为光心，<code>F</code>为焦点。每个透镜主轴上都有一个特殊点，凡是通过该点的光，其传播方向不变，这个点叫光心。经过光心的光线的传播方向不会发生改变。</p>
+<h2 id="相机标定原理模型">相机标定原理模型
+</h2><p><img src="/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio.png"
+	width="1568"
+	height="716"
+	srcset="/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b04ff5d1e7a1a51e.png 480w, /p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b5f60b8ddd2d3fb1.png 1024w"
+	loading="lazy"
+	
+		alt="相机标定.drawio"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="218"
+		data-flex-basis="525px"
+	
+></p>
+<h3 id="针孔相机模型">针孔相机模型
+</h3><p>我们通常将相机看成如下所示的透镜模型：</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/2.png" alt="img" style="zoom:50%;" />
+</div>
+<p>在实际分析时，通常将其简化为针孔模型（小孔成像）：</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/4.png" alt="img" style="zoom:50%;" />
+</div>
+<p>一般为了分析简单，将成像平面画在对称位置，这样图像不再颠倒：</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/5.png" alt="img" style="zoom:50%;" />
+</div>
+<h3 id="四个坐标系">四个坐标系
+</h3><p><strong>世界坐标系</strong>：用户定义的三维世界的坐标系，用于描述目标物体在真实世界里的位置。单位通常为米（m）。该坐标系作用于三维空间。</p>
+<p><strong>相机坐标系</strong>：在相机上建立的坐标系，为了从相机的角度描述物体位置而定义，作为沟通世界坐标系和图像/像素坐标系的中间一环。单位通常为米（m）。相机坐标系的原点在光心，其 $X_c、Y_c$ 轴分别与像面的两边平行，其 $Z_c$ 轴与光轴重合，且垂直于图像坐标系平面并通过图像坐标系的原点（实际情况中可能存在<strong>主点偏移</strong>），相机坐标系与图像坐标系之间的距离为焦距 $f$。该坐标系作用于三维空间。</p>
+<p><strong>图像坐标系</strong>：为了描述成像过程中物体从相机坐标系到图像坐标系的投影投射关系而引入，方便进一步得到像素坐标系下的坐标。其原点是相机光轴与像面的交点（称为主点），即<strong>图像的中心点</strong>。其 $x, y$ 轴和像素坐标系的 $u, v$ 轴平行，故图像坐标系和像素坐标系实际是平移关系。单位通常为毫米（mm）。该坐标系作用于二维空间。</p>
+<p><strong>像素坐标系</strong>：为了描述物体成像后的像点在数字图像上（相片）的坐标而引入，是我们真正从相机内读取到的信息所在的坐标系。单位为像素。像素坐标平面和图像坐标系平面重合，但像素坐标系原点位于图像左上角。该坐标系作用于二维空间。</p>
+<p><img src="/p/camera-calibration/assets/6.png"
+	width="1248"
+	height="841"
+	srcset="/p/camera-calibration/assets/6_hu_5b9c7ac273581063.png 480w, /p/camera-calibration/assets/6_hu_8632a9ab9fc48ffe.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="148"
+		data-flex-basis="356px"
+	
+></p>
+<h3 id="相机外参">相机外参
+</h3><p>将世界坐标系中的点映射到相机坐标系：相机坐标系是世界坐标系通过<strong>刚体变换</strong>得到的。</p>
+<blockquote>
+<p>刚体变换能够保持物体中各点的距离和角度，常见的刚体变换有：平移、旋转和镜像。</p>
+</blockquote>
+<p>我们先只考虑旋转，假设将坐标系以 $X$ 轴为中心进行旋转，即 $X$ 不变，旋转 $Y - Z$ 平面。</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/7.png" alt="img" style="zoom: 33%;" />
+</div>
+<p>假设旋转角度为 $\theta$，即 $\angle Y&rsquo; O Y = \angle Z&rsquo; O Z = \theta$。旋转前的坐标系为 $X - Y - Z$，旋转后的坐标系为 $X&rsquo; - Y&rsquo; - Z&rsquo;$。假设点 $P$ 在 $X - Y - Z$ 中的坐标为（$X_w, Y_w, Z_w$），旋转后，其在 $X&rsquo; - Y&rsquo; - Z&rsquo;$ 中的坐标为（$X_c, Y_c, Z_c$）：
+$$
+X_C = X_w
+$$</p>
+<p>$$
+\begin{array}{l}
+Y_c &amp; = OC + CD = OA \cdot \sin \theta + BP \\
+&amp; = Z_w \cdot \sin \theta + AP \cdot \cos \theta \\
+&amp; = Z_w \sin \theta + Y_w \cos \theta
+\end{array}
+$$</p>
+<p>$$
+\begin{array}{l}
+Z_c &amp; = PD = AC - AB \\
+&amp; = AO \cdot \cos \theta - AP \cdot \cos \theta \\
+&amp; = Z_w \cos \theta + Y_w \cos \theta
+\end{array}
+$$</p>
+<p>写成矩阵形式：
+$$\displaystyle \begin{bmatrix} X_c \\ Y_c \\ Z_c \end{bmatrix} = \mathbf{R_{cw}} \begin{bmatrix} X_w \\ Y_w \\ Z_w \end{bmatrix} or \begin{bmatrix} X_w \\ Y_w \\ Z_w \end{bmatrix} = \mathbf{R_{wc}} \begin{bmatrix} X_c \\ Y_c \\ Z_c \end{bmatrix} $$
+推广到每个方向，可得到 $\mathbf{R_{cw}}, \mathbf{R_{wc}}$ 为：
+$$
+\mathbf{R_{cw}} (X_A, \theta) =
+\begin{bmatrix}
+1 &amp; 0 &amp; 0 \\
+0 &amp; \cos \theta &amp; \sin \theta \\
+0 &amp; - \sin \theta &amp; \cos \theta
+\end{bmatrix}
+,
+\mathbf{R_{wc}} (X_A, \theta) =
+\begin{bmatrix}
+1 &amp; 0 &amp; 0 \\
+0 &amp; \cos \theta &amp; - \sin \theta \\
+0 &amp; \sin \theta &amp; \cos \theta
+\end{bmatrix}
+$$
+$$
+\mathbf{R_{cw}} (Y_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp; 0 &amp; \sin \theta \\
+0 &amp; 1 &amp; 0 \\ - \sin \theta &amp; 0 &amp; \cos \theta
+\end{bmatrix}
+,
+\mathbf{R_{wc}} (Y_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp; 0 &amp; - \sin \theta \\
+0 &amp; 1 &amp; 0 \\
+\sin \theta &amp; 0 &amp; \cos \theta
+\end{bmatrix}
+$$
+$$
+\mathbf{R_{cw}} (Z_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp; \sin \theta &amp; 0 \\ - \sin \theta &amp; \cos \theta &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix}
+,
+\mathbf{R_{wc}} (Z_A, \theta) =
+\begin{bmatrix}
+\cos \theta &amp; - \sin \theta &amp; 0 \\
+\sin \theta &amp; \cos \theta &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix}
+$$</p>
+<p>这里我们使用右手笛卡尔三维坐标系：</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/14.png" alt="img" style="zoom: 25%;" />
+</div>
+<p>旋转可分为<strong>主动旋转</strong>与<strong>被动旋转</strong>。<strong>主动旋转</strong>是指将向量逆时针围绕旋转轴所做出的旋转。<strong>被动旋转</strong>是对坐标轴本身进行的逆时针旋转，它相当于主动旋转的逆操作。关于右手笛卡尔坐标系的 $X, Y, Z$ 轴的旋转分别叫做<code>roll</code>，<code>pitch</code>和<code>yaw</code>旋转：</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/15.png" alt="img" style="zoom: 20%;" />
+</div>
+<p>因为逆时针和顺时针旋转会得到不一样的旋转矩阵，所以我们统一如下：</p>
+<p>绕 $X$ 轴的主动旋转定义为（$\theta_x$ 是<code>roll</code>角 ）：
+$$
+R(X_A, \theta_x) =
+\begin{bmatrix}
+1 &amp; 0 &amp; 0 \\
+0 &amp; \cos \theta_x &amp; - \sin \theta_x \\
+0 &amp; \sin \theta_x &amp; \cos \theta_x
+\end{bmatrix} =
+\exp \left ( \theta_x
+\begin{bmatrix}
+0 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; -1\\
+0 &amp; 1 &amp; 0
+\end{bmatrix}
+\right )
+$$
+绕 $Y$ 轴的主动旋转定义为（$\theta_y$ 是<code>pitch</code>角）：
+$$
+R(Y_A, \theta_y) =
+\begin{bmatrix}
+\cos \theta_y &amp; 0 &amp; \sin \theta_y \\
+0 &amp; 1 &amp; 0 \\ - \sin \theta_y &amp; 0 &amp; \cos \theta_y
+\end{bmatrix} =
+\exp \left ( \theta_y
+\begin{bmatrix}
+0 &amp; 0 &amp; 1\\
+0 &amp; 0 &amp; 0\\ -1 &amp; 0 &amp; 0
+\end{bmatrix}
+\right )
+$$
+绕 $Z$ 轴的主动旋转定义为（$\theta_z$ 是<code>yaw</code>角）：
+$$
+R(Z_A, \theta_z) =
+\begin{bmatrix}
+\cos \theta_z &amp; - \sin \theta_z &amp; 0 \\
+\sin \theta_z &amp; \cos \theta_z &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix} =
+\exp \left ( \theta_y
+\begin{bmatrix}
+0 &amp; -1 &amp; 0\\
+1 &amp; 0 &amp; 0\\
+0 &amp; 0 &amp; 0
+\end{bmatrix}
+\right )
+$$
+将上述三个旋转矩阵结合起来，最终的旋转矩阵（设绕 $X, Y, Z$ 轴旋转的角度分别为 $\alpha, \beta, \gamma$）：
+$$
+\begin{array}{ll}
+M(\alpha, \beta, \gamma) &amp; = R_x(\alpha) R_y(\beta) R_z(\gamma) \\
+&amp; =
+\begin{bmatrix}
+1 &amp; 0 &amp; 0 \\
+0 &amp; \cos \alpha &amp; - \sin \alpha \\
+0 &amp; \sin \alpha &amp; \cos \alpha
+\end{bmatrix}
+\begin{bmatrix}
+\cos \beta  &amp; 0 &amp; \sin \beta  \\
+0 &amp; 1 &amp; 0 \\ - \sin \beta  &amp; 0 &amp; \cos \beta
+\end{bmatrix}
+\begin{bmatrix}
+\cos \gamma &amp; -\sin \gamma &amp; 0 \\
+\sin \gamma &amp; \cos \gamma &amp; 0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix} \\
+&amp; = \begin{bmatrix}
+\cos \gamma \cos \beta &amp; - \sin \gamma \cos \alpha + \cos \gamma \sin \beta \sin \alpha &amp; \sin \gamma \sin \alpha + \cos \gamma \sin \beta \cos \alpha \\
+\sin \gamma \cos \beta &amp; \cos \gamma \cos \alpha + \sin \gamma \sin \beta \sin \alpha &amp; - \cos \gamma \sin \alpha + \sin \gamma \sin \beta \cos \alpha \\ - \sin \beta &amp; \cos \beta \sin \alpha &amp; \cos \beta \cos \alpha
+\end{bmatrix}
+\end{array}
+$$</p>
+<p>此时我们再加上平移向量 $T$ 便可完成从世界坐标系到相机坐标系的这个刚体变换了：</p>
+<p>$$
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c
+\end{bmatrix} =
+\begin{bmatrix}
+r_{11} &amp; r_{12} &amp; r_{13} \\
+r_{21} &amp; r_{22} &amp; r_{23} \\
+r_{31} &amp; r_{32} &amp; r_{33}
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w
+\end{bmatrix} +
+\begin{bmatrix}
+t_x \\
+t_y \\
+t_z
+\end{bmatrix} =
+\mathbf{R}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w
+\end{bmatrix} + T
+$$</p>
+<p>可进一步写成如下形式：</p>
+<p>$$
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix} =
+\begin{bmatrix}
+\mathbf{R} &amp; \mathbf{T} \\
+0_3^T &amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w \\
+1
+\end{bmatrix}
+$$</p>
+<p>其中，$\mathbf{R}$ 和 $\mathbf{T}$ 便是相机外参。</p>
+<h3 id="相机内参">相机内参
+</h3><p>首先考虑图像坐标系（$xy$）和像素坐标系（$uv$）之间的转换：</p>
+<p><img src="/p/camera-calibration/assets/8.png"
+	width="369"
+	height="245"
+	srcset="/p/camera-calibration/assets/8_hu_9f87285a95280818.png 480w, /p/camera-calibration/assets/8_hu_dfddc6288d181165.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="150"
+		data-flex-basis="361px"
+	
+></p>
+<p>$$
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix}=
+\begin{bmatrix}
+\displaystyle \frac{1}{dx} &amp; 0 &amp; u_0 \\
+0 &amp; \displaystyle \frac{1}{dy} &amp; v_0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix}=
+\begin{bmatrix}
+x \\
+y \\
+1
+\end{bmatrix}
+$$</p>
+<p>$dx$ 表示一个像素点在 $x$ 方向的长度是多少毫米，$dy$ 表示一个像素点在 $y$ 方向的长度是多少毫米；$(u_0, v_0)$ 为图像的中心点。</p>
+<p>然后考虑相机坐标系和图像坐标系之间的转换：</p>
+<p><img src="/p/camera-calibration/assets/9.png"
+	width="353"
+	height="346"
+	srcset="/p/camera-calibration/assets/9_hu_44c35cb9499af1dd.png 480w, /p/camera-calibration/assets/9_hu_4193e46aa668811.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="102"
+		data-flex-basis="244px"
+	
+></p>
+<p>$$
+\Delta ABO_c \sim \Delta oCO_c, \Delta PBO_c \sim \Delta pCO_c
+$$
+$$
+\displaystyle \frac{AB}{oC} = \frac{AO_c}{oO_c} = \frac{PB}{p C} = \frac{X_c}{x} = \frac{Z_c}{f} = \frac{Y_c}{y}
+$$
+$$
+x = f \displaystyle \frac{X_c}{Z_c}, y = f \frac{Y_c}{Z_c}
+$$</p>
+<p>$$
+Z_c \begin{bmatrix}
+x \\
+y \\
+1
+\end{bmatrix}=
+\lambda
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix}=
+\begin{bmatrix}
+f &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; f &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix}
+$$</p>
+<p>其中，$f$ 是焦距，结合外参我们最终可以得到世界坐标系和像素坐标系之间的映射关系：</p>
+<p>$$
+\begin{array}{l}
+\lambda \begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix} &amp; =
+\begin{bmatrix}
+\displaystyle \frac{1}{dx} &amp; 0 &amp; u_0 \\
+0 &amp; \displaystyle \frac{1}{dy} &amp; v_0 \\
+0 &amp; 0 &amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+f &amp; 0 &amp; 0 &amp; 0 \\
+0 &amp; f &amp; 0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{R} &amp; \mathbf{T} \\
+0 &amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w \\
+1
+\end{bmatrix}\\
+&amp; =
+\begin{bmatrix}
+fx &amp; 0 &amp; u_0 &amp; 0 \\
+0 &amp; fy &amp; v_0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+\mathbf{R} &amp; \mathbf{T} \\
+0 &amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X_w \\
+Y_w \\
+Z_w \\
+1
+\end{bmatrix}
+\end{array}
+$$
+其中，相机内参为（不考虑图像传感器的特性）：
+$$
+\begin{bmatrix}
+fx &amp; 0 &amp; u_0 &amp; 0 \\
+0 &amp; fy &amp; v_0 &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0
+\end{bmatrix}
+$$</p>
+<p>其中，$f_x, f_y$ 即为焦距的物理距离在像素坐标系中的长度，相机内参标定主要是标定相机的焦距、主点、歪斜等内部参数。</p>
+<h2 id="可能存在的影响">可能存在的影响
+</h2><h3 id="主点偏移">主点偏移
+</h3><p>主点是光轴和相机成像平面的交点，在理想情况下，图像坐标系和相机坐标系原点重合，不存在坐标系偏移。但在实际情况中，图像坐标系往往在图片的左上角，光轴过图像中心，因此图像坐标系和相机坐标系不重合。两个坐标系之间存在一个平移运动：</p>
+<div style="display: flex; justify-content: center;">
+    <img src="assets/v2-d05b86c51be4aec5c412e2ca74afaf22_1440w.png" alt="img" style="zoom: 67%;" />
+</div>
+<p>考虑主点偏移后，图像坐标和3D在相机坐标系的关系为：</p>
+<p>$$
+\begin{matrix}
+u = f \frac{X}{Z} + O_x \\
+v = f \frac{X}{Z} + O_y
+\end{matrix}
+$$
+此时，透视投影模型（像素坐标系和相机坐标系）的关系为：
+$$
+\lambda
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix} =
+\begin{bmatrix}
+f &amp; 0 &amp; O_x &amp; 0 \\
+0 &amp; f &amp; O_x &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix}
+$$</p>
+<p>仔细观察就会发现，该关系与上面提到的关系是等价的，只不过上面使用坐标 $(u_0, v_0)$ 来代表偏移量 $(O_x, O_y)$。</p>
+<h3 id="图像传感器特征">图像传感器特征
+</h3><p>图像传感器像原尺寸在制造过程可能不是正方形，同时可能存在歪斜（skewed），因此需要考虑这些影响因素，传感器歪斜和不是正方形主要对相机 $x$ 和 $y$ 方向的焦距产生影响。</p>
+<div style="display: flex; justify-content: center;">
+<img src="assets/v2-a812da34b739588fa9142c46839ad281_1440w.png" alt="img" style="zoom: 50%;" />
+</div>
+<p>此时，透视投影模型（像素坐标系和相机坐标系）的关系为：
+$$
+\lambda
+\begin{bmatrix}
+u \\
+v \\
+1
+\end{bmatrix} =
+\begin{bmatrix}
+f &amp; s &amp; O_x &amp; 0 \\
+0 &amp; \eta f &amp; O_x &amp; 0 \\
+0 &amp; 0 &amp; 1 &amp; 0
+\end{bmatrix}
+\begin{bmatrix}
+X_c \\
+Y_c \\
+Z_c \\
+1
+\end{bmatrix} = [K, 0_3] P
+$$
+其中，$K$ 矩阵即为最终的内参矩阵。</p>
+<h3 id="镜头畸变">镜头畸变
+</h3><p>小孔成像模型虽然充分考虑了相机内部参数对成像的影响，但没有考虑成像系统另一个重要的部分，镜头。镜头常用的有普通镜头、广角镜头、鱼眼镜头等，在无人驾驶和视觉slam领域，鱼眼镜头和广角镜头用的很多，主要是视角很大，可以观测到更多的信息。任何镜头都存在不同程度的畸变，不同类型的镜头用到的畸变模型也不相同。</p>
+<p>在几何光学和阴极射线管（CRT）显示中，畸变（distortion）是对直线投影的一种偏移。简单来说直线投影是场景内的一条直线投影到图片上也保持为一条直线。那畸变简单来说就是一条直线投影到图片上不能保持为一条直线了，这是一种光学畸变。畸变一般可以分为两大类，包括<strong>径向畸变（radial distortion）<strong>和</strong>切向畸变（tangential distortion）</strong>。</p>
+<p>径向畸变来自于透镜形状，主要是由于透镜不同部位放大倍率不同造成的。切向畸变来自于整个相机的组装过程，主要是由于透镜安装与成像平面不平行造成的。</p>
+<p><img src="/p/camera-calibration/assets/10.png"
+	width="456"
+	height="300"
+	srcset="/p/camera-calibration/assets/10_hu_c4be30cad665993a.png 480w, /p/camera-calibration/assets/10_hu_20d6f5f799836763.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="152"
+		data-flex-basis="364px"
+	
+></p>
+<h4 id="径向畸变">径向畸变
+</h4><p>透过镜头边缘的光线很容易产生径向畸变，这种现象来源于“筒形”或“鱼眼”的影响。光线离镜头中心越远，畸变越大。</p>
+<p><img src="/p/camera-calibration/assets/v2-d76fefc82f8dfa9361518b34d4e0e911_1440w.png"
+	width="765"
+	height="248"
+	srcset="/p/camera-calibration/assets/v2-d76fefc82f8dfa9361518b34d4e0e911_1440w_hu_9d8a8b0b134446f9.png 480w, /p/camera-calibration/assets/v2-d76fefc82f8dfa9361518b34d4e0e911_1440w_hu_d17c02055047d06e.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="308"
+		data-flex-basis="740px"
+	
+></p>
+<p>从图像可以看出，径向畸变以某一个中心往外延伸，且越往外，畸变越大；显然畸变与距离成一种非线性的变换关系，参考众多文献，可以用多项式来近似：
+$$
+\begin{matrix}
+x_{rcrt} = x(1 + k_1 r^2 + k_2 r^4 + k_3 r^6) \\\\
+y_{rcrt} = y(1 + k_1 r^2 + k_2 r^4 + k_3 r^6)
+\end{matrix}
+$$
+其中，$x, y$ 是归一化的图像坐标，即坐标原点已经移动到主点，并且像素坐标除以焦距。$k_1, k_2, k_3$ 是径向畸变系数，$r^2 = x^2 + y^2$。</p>
+<h4 id="切向畸变">切向畸变
+</h4><p>切向畸变主要发生在相机sensor和镜头不平行的情况下；因为有夹角，所以光透过镜头传到图像传感器上时，成像位置发生了变化。</p>
+<p><img src="/p/camera-calibration/assets/11.png"
+	width="926"
+	height="385"
+	srcset="/p/camera-calibration/assets/11_hu_d433edc6c4b7271e.png 480w, /p/camera-calibration/assets/11_hu_c733864f611baebd.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="240"
+		data-flex-basis="577px"
+	
+>
+$$
+\begin{matrix}
+x_{tcrt} = x + [2p_1 xy + p_2 (r^2 + 2 x^2)] \\\\
+y_{tcrt} = y + [2p_2 xy + p_1 (r^2 + 2 y^2)]
+\end{matrix}
+$$
+其中，$x, y$ 是归一化的图像坐标，即坐标原点已经移动到主点，并且像素坐标除以焦距。$p_1, p_2$ 是切向畸变系数，$r^2 = x^2 + y^2$。</p>
+<h3 id="消除镜头畸变">消除镜头畸变
+</h3><p>考虑镜头畸变前，我们可以将相机标定简单描述为以下过程：像素坐标 $(u_{ccd}, v_{ccd})$ $\to$ 图像坐标 $(x, y)$ $\to$ 相机坐标 $(X_c, Y_c, Z_c)$ $\to$ 世界坐标 $(X_w, Y_w, Z_w)$。</p>
+<p>此时我们考虑加入镜头畸变：
+$$
+\begin{matrix}
+x_{crt} = x_{rcrt} + x_{tcrt} \\\\
+y_{crt} = y_{rcrt} + y_{tcrt}
+\end{matrix}
+$$
+得到消除镜头畸变的相机标定流程：像素坐标 $(u_{ccd - crt}, v_{ccd - crt})$ $\to$ 图像坐标 $(x_{crt}, y_{crt})$ $\to$ 相机坐标 $(X_c, Y_c, Z_c)$ $\to$ 世界坐标 $(X_w, Y_w, Z_w)$。</p>
+<h2 id="标定板的作用">标定板的作用
+</h2><h3 id="相机标定中的参数">相机标定中的参数
+</h3><p><img src="/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio.png"
+	width="1568"
+	height="716"
+	srcset="/p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b04ff5d1e7a1a51e.png 480w, /p/camera-calibration/assets/%E7%9B%B8%E6%9C%BA%E6%A0%87%E5%AE%9A.drawio_hu_b5f60b8ddd2d3fb1.png 1024w"
+	loading="lazy"
+	
+		alt="相机标定"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="218"
+		data-flex-basis="525px"
+	
+></p>
+<p>针孔相机模型中，只要确定这9个参数就可以唯一的确定针孔相机模型：</p>
+<p>$$
+f_x,f_y,O_x,O_y,k_1,k_2,k_3,p_1,p_2
+$$</p>
+<p>这个过程就称为「相机标定」，其中前4个我们称为内参数，后5个称为畸变参数，畸变参数是为了补充内参的。所以一旦相机结构固定，包括镜头结构固定，对焦距离固定，我们就可以用这9个的参数去近似这个相机。这里说的「镜头结构固定」，按我个人的理解，除了焦距固定之外，也应当包含光圈固定，因为改变光圈的大小，除了景深之外，是有可能改变针孔相机模型中的光心位置，但是影响并不是很大。这意味着标定好的相机如果改变光圈大小，会使得标定误差变大但应该不会大到难以接受的地步。</p>
+<p>对于针孔相机本身需要拟合的方程如下：</p>
+<p>$$
+\begin{bmatrix}
+u_{ccd - crt} * Z\\
+v_{ccd - crt} * Z\\
+Z
+\end{bmatrix} =
+J(k_1, k_2, k_3, p_1, p_2)
+\begin{bmatrix}
+f_x &amp; 0 &amp; O_x \\
+0 &amp; f_y &amp; O_y \\
+0 &amp; 0 &amp; 1
+\end{bmatrix}
+\begin{bmatrix}
+X \\
+Y \\
+X
+\end{bmatrix}
+$$</p>
+<p>因此，我们现在的任务就是找出一大堆具有对应关系的像点 ${(u_{ccd - crt}, v_{ccd - crt}) ^T }$ 和物点 ${ (X, Y, Z)^T }$ 的点作为样本，来训练出模型的参数。这里就引发了两个问题：</p>
+<ul>
+<li>这么多像点和物点如何匹配？</li>
+<li>即便现在知道物点的位置，如何用相机坐标系来表达物点的位置 $(X, Y, Z)$？</li>
+</ul>
+<p>为了解决上述问题，标定板应运而生。标定板的一大作用，确定物点和像点的对应性。这里用到的原理主要是「透视不变性」，打个比方，你近看一个人和远看一个人，虽然他的鼻子大小变了，你看鼻子的视角也变了，但是拓扑结构肯定是不变的，你也不可能把鼻子看成是嘴巴。</p>
+<p><img src="/p/camera-calibration/assets/v2-c6f1ebb7bfbef57c665546683b283de1_1440w.png"
+	width="803"
+	height="363"
+	srcset="/p/camera-calibration/assets/v2-c6f1ebb7bfbef57c665546683b283de1_1440w_hu_16a50ef39326671d.png 480w, /p/camera-calibration/assets/v2-c6f1ebb7bfbef57c665546683b283de1_1440w_hu_163bb58b92dacbf1.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="221"
+		data-flex-basis="530px"
+	
+></p>
+<p>所以在标定板中，印刷了拓扑结构，广泛应用的是棋盘格和圆点格，这两种之所以成为主流，不仅是因为它们的拓扑结构明确且均匀，更重要的是检测其拓扑结构的算法简单且有效。棋盘格检测的是角点，只要对拍摄到的棋盘格图像横纵两个方向计算梯度就可获得；而圆点格的检测只需要对拍摄到的圆点格图样计算质心即可。假如你开发了一套非常完美的检测人脸全部特征的算法，你完全可以用你的照片当作标定板。</p>
+<p>按照我的经验，圆点格的效果应该是好于棋盘格，因为圆点质心的「透视不变性」要比棋盘格的角点稳定的多。下图是同样尺寸、同样比例棋盘格和圆点在最大重投影误差处的误差对比，红色十字是提取的角点/质心，绿色圆圈是针孔相机模型计算出来认为的角点/质心位置。</p>
+<p>但是圆点格的检测似乎是Halcon的专利（存疑），因此OpenCV和Matlab标定工具箱用的是棋盘格，要用圆点格得要自己写算法。下文中提到的标定板说的都是棋盘格。</p>
+<p>标定板的第二大作用是把标定板中的角点变换到相机坐标系下的坐标 $(X, Y, Z)$。对于标定的初学者来说，很容易忽略的一点是标定板是具有标定板坐标系的。换句话说，标定板中的每个角点，在标定板坐标系下的位置是确定并且是已知的。</p>
+<p><img src="/p/camera-calibration/assets/v2-67b8737534163cb960564df54e4361cb_1440w.png"
+	width="447"
+	height="404"
+	srcset="/p/camera-calibration/assets/v2-67b8737534163cb960564df54e4361cb_1440w_hu_6bebaf6d7304883d.png 480w, /p/camera-calibration/assets/v2-67b8737534163cb960564df54e4361cb_1440w_hu_8cae43f4d167e8c9.png 1024w"
+	loading="lazy"
+	
+		alt="img"
+	
+	
+		class="gallery-image" 
+		data-flex-grow="110"
+		data-flex-basis="265px"
+	
+></p>
+<p>而标定板坐标系变换到相机坐标系的变换矩阵，我们称它的元素为外参数。</p>
+<h3 id="如何使用标定板">如何使用标定板
+</h3><p>如果用OpenCV或Matlab标定工具箱进行标定，需要给出棋盘格的物理尺寸，这其实就是在建立标定板坐标系，从测量的角度讲，标定板的精度是相机标定精度的基准，是误差传递链上的第一个环节。所以为了使针孔相机模型更逼近真实相机，对标定板的质量有以下要求（按重要性顺序）：</p>
+<ul>
+<li>标定板的平面度高，棋盘格是直角。</li>
+<li>标定板每个格子尺寸的高一致性。</li>
+<li>真实尺寸与标称尺寸的差异小。</li>
+</ul>
+
+</section>
+
+
+    <footer class="article-footer">
+    
+    <section class="article-tags">
+        
+            <a href="/tags/camera/">Camera</a>
+        
+    </section>
+
+
+    
+    <section class="article-copyright">
+        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-copyright" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
+  <path stroke="none" d="M0 0h24v24H0z"/>
+  <circle cx="12" cy="12" r="9" />
+  <path d="M14.5 9a3.5 4 0 1 0 0 6" />
+</svg>
+
+
+
+        <span>Licensed under CC BY-NC-SA 4.0</span>
+    </section>
+    </footer>
+
+
+    
+        <link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css"integrity="sha384-n8MVd4RsNIU0tAv4ct0nTaAbDJwPJzDEaqSD1odI&#43;WdtXRGWt2kTvGFasHpSy3SV"crossorigin="anonymous"
+            ><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"integrity="sha384-XjKyOOlGwcjNTAIQHIpgOno0Hl1YQqzUOEleOLALmuqehneUG&#43;vnGctmUb0ZY0l8"crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"integrity="sha384-&#43;VBxd3r6XgURycqtZ117nYw44OOcIax56Z4dCRWbxyPt0Koah1uHoK0o4&#43;/RRE05"crossorigin="anonymous"
+                defer
+                >
+            </script><script>
+    window.addEventListener("DOMContentLoaded", () => {
+        renderMathInElement(document.body, {
+            delimiters: [
+                { left: "$$", right: "$$", display: true },
+                { left: "$", right: "$", display: false },
+                { left: "\\(", right: "\\)", display: false },
+                { left: "\\[", right: "\\]", display: true }
+            ],
+            ignoredClasses: ["gist"]
+        });})
+</script>
+    
+</article>
+
+    
+
+    
+
+     
+    
+        
+    
+
+    <footer class="site-footer">
+    <section class="copyright">
+        &copy; 
+        
+            2023 - 
+        
+        2025 3000ye&#39;s Blog
+    </section>
+    
+    <section class="powerby">
+        Built with <a href="https://gohugo.io/" target="_blank" rel="noopener">Hugo</a> <br />
+        Theme <b><a href="https://github.com/CaiJimmy/hugo-theme-stack" target="_blank" rel="noopener" data-version="3.29.0">Stack</a></b> designed by <a href="https://jimmycai.com" target="_blank" rel="noopener">Jimmy</a>
+    </section>
+</footer>
+
+
+    
+<div class="pswp" tabindex="-1" role="dialog" aria-hidden="true">
+
+    
+    <div class="pswp__bg"></div>
+
+    
+    <div class="pswp__scroll-wrap">
+
+        
+        <div class="pswp__container">
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+            <div class="pswp__item"></div>
+        </div>
+
+        
+        <div class="pswp__ui pswp__ui--hidden">
+
+            <div class="pswp__top-bar">
+
+                
+
+                <div class="pswp__counter"></div>
+
+                <button class="pswp__button pswp__button--close" title="Close (Esc)"></button>
+
+                <button class="pswp__button pswp__button--share" title="Share"></button>
+
+                <button class="pswp__button pswp__button--fs" title="Toggle fullscreen"></button>
+
+                <button class="pswp__button pswp__button--zoom" title="Zoom in/out"></button>
+
+                
+                
+                <div class="pswp__preloader">
+                    <div class="pswp__preloader__icn">
+                        <div class="pswp__preloader__cut">
+                            <div class="pswp__preloader__donut"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="pswp__share-modal pswp__share-modal--hidden pswp__single-tap">
+                <div class="pswp__share-tooltip"></div>
+            </div>
+
+            <button class="pswp__button pswp__button--arrow--left" title="Previous (arrow left)">
+            </button>
+
+            <button class="pswp__button pswp__button--arrow--right" title="Next (arrow right)">
+            </button>
+
+            <div class="pswp__caption">
+                <div class="pswp__caption__center"></div>
+            </div>
+
+        </div>
+
+    </div>
+
+</div><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.js"integrity="sha256-ePwmChbbvXbsO02lbM3HoHbSHTHFAeChekF1xKJdleo="crossorigin="anonymous"
+                defer
+                >
+            </script><script 
+                src="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe-ui-default.min.js"integrity="sha256-UKkzOn/w1mBxRmLLGrSeyB4e1xbrp4xylgAWb3M42pU="crossorigin="anonymous"
+                defer
+                >
+            </script><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/default-skin/default-skin.min.css"crossorigin="anonymous"
+            ><link 
+                rel="stylesheet" 
+                href="https://cdn.jsdelivr.net/npm/photoswipe@4.1.3/dist/photoswipe.min.css"crossorigin="anonymous"
+            >
+
+            </main>
+        </div>
+        <script 
+                src="https://cdn.jsdelivr.net/npm/node-vibrant@3.1.6/dist/vibrant.min.js"integrity="sha256-awcR2jno4kI5X0zL8ex0vi2z&#43;KMkF24hUW8WePSA9HM="crossorigin="anonymous"
+                
+                >
+            </script><script type="text/javascript" src="/ts/main.1e9a3bafd846ced4c345d084b355fb8c7bae75701c338f8a1f8a82c780137826.js" defer></script>
+<script>
+    (function () {
+        const customFont = document.createElement('link');
+        customFont.href = "https://fonts.googleapis.com/css2?family=Lato:wght@300;400;700&display=swap";
+
+        customFont.type = "text/css";
+        customFont.rel = "stylesheet";
+
+        document.head.appendChild(customFont);
+    }());
+</script>
+
+    </body>
+</html>
