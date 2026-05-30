@@ -104,11 +104,18 @@ jobs:
         id: deployment
         uses: actions/deploy-pages@v5
 
+      - name: Checkout
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 2
+
       - name: Notify webhook
         run: |
-          curl -fsSL -X POST "https://www.feishu.cn/flow/api/trigger-webhook/a0dc5bd24ed9110b2d715ead498f4de0" \
-            -H "Content-Type: application/json" \
-            -d '{
-              "commit": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
-              "deploy_url": "${{ steps.deployment.outputs.page_url }}"
-            }'
+          COMMIT_TEXT="$(git show --format=fuller ${{ github.sha }})"
+          jq -n \
+            --arg commit "$COMMIT_TEXT" \
+            --arg deploy_url "${{ steps.deployment.outputs.page_url }}" \
+            '{commit: $commit, deploy_url: $deploy_url}' \
+          | curl -fsSL -X POST "https://www.feishu.cn/flow/api/trigger-webhook/a0dc5bd24ed9110b2d715ead498f4de0" \
+              -H "Content-Type: application/json" \
+              -d @-
