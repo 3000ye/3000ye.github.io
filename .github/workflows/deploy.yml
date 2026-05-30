@@ -103,3 +103,12 @@ jobs:
       - name: Deploy to GitHub Pages
         id: deployment
         uses: actions/deploy-pages@v5
+
+      - name: Notify webhook
+        run: |
+          curl -fsSL -X POST "https://www.feishu.cn/flow/api/trigger-webhook/a0dc5bd24ed9110b2d715ead498f4de0" \
+            -H "Content-Type: application/json" \
+            -d '{
+              "commit": "${{ github.server_url }}/${{ github.repository }}/commit/${{ github.sha }}",
+              "deploy_url": "${{ steps.deployment.outputs.page_url }}"
+            }'
