@@ -1,6 +1,6 @@
 ---
 title: Pandas for Quant Data Process
-description: 
+description: 量化数据处理中的 Pandas 完整手册
 date: 2026-06-01T01:44:26+08:00
 # image: assets/gitssh.png
 math: true
