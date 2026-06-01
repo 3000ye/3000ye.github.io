@@ -657,14 +657,4 @@ Parquet 列裁剪 + dtype 降型 + 分块；或换 Polars / DuckDB / Dask。
 **Q: merge_asof 用在哪？**
 按最近时间对齐不同频/不对齐的时序：成交配报价、低频因子贴到高频价格。
 
----
-
-### 复习优先级（面试前一晚）
-1. loc/iloc、布尔过滤、SettingWithCopy
-2. groupby 的 agg/transform/apply 区别 + 截面 transform
-3. shift 防未来函数 + IC/分层回测逻辑
-4. resample / rolling / ewm
-5. merge_asof + 长宽表互转
-6. 向量化 vs apply 性能
-
 > 核心心法：**量化 Pandas = 截面（groupby date + transform/rank）× 时序（groupby symbol + rolling/shift）的二维操作，全程防未来函数。**
