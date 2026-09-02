@@ -1,6 +1,6 @@
 ---
 title: "Karabiner"
-description: 
+description: "Macos 使用 Karabiner 实现 HHKB 键位配置"
 date: 2025-01-25T11:57:31+08:00
 image: 
 math: true

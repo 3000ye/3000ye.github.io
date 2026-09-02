@@ -1,6 +1,6 @@
 ---
 title: "Git moji"
-description: 
+description: "Git 提交与 Moji 使用规范"
 date: 2025-01-19T23:46:43+08:00
 image: 
 math: true

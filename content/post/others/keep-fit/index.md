@@ -1,6 +1,6 @@
 ---
 title: 减脂 + 腹肌 健身计划
-description: 四分化循环（推 / 腿臀 / 拉 / 有氧腹部），每个动作带 GIF、要领和常见错误
+description: 四分化循环（推 / 腿臀 / 拉 / 有氧腹部）
 date: 2026-09-02T10:10:00+08:00
 slug: keep-fit
 image: 
